@@ -1,0 +1,5 @@
+(L:ABC) = 1;
+(L:ABC, number) = 1;
+---
+1 (>L:ABC)
+1 (>L:ABC,number)

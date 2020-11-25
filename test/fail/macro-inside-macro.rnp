@@ -1,0 +1,8 @@
+macro a() {
+  macro b() {}
+}
+---
+SyntaxError: Cannot declare macro inside macro
+fail/macro-inside-macro.rnp:2:3
+  macro b() {}
+  ^^^^^

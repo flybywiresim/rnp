@@ -1,0 +1,57 @@
+# RPN only has 50 registers
+let v0 = 1;
+let v1 = 1;
+let v2 = 1;
+let v3 = 1;
+let v4 = 1;
+let v5 = 1;
+let v6 = 1;
+let v7 = 1;
+let v8 = 1;
+let v9 = 1;
+let v10 = 1;
+let v11 = 1;
+let v12 = 1;
+let v13 = 1;
+let v14 = 1;
+let v15 = 1;
+let v16 = 1;
+let v17 = 1;
+let v18 = 1;
+let v19 = 1;
+let v20 = 1;
+let v21 = 1;
+let v22 = 1;
+let v23 = 1;
+let v24 = 1;
+let v25 = 1;
+let v26 = 1;
+let v27 = 1;
+let v28 = 1;
+let v29 = 1;
+let v30 = 1;
+let v31 = 1;
+let v32 = 1;
+let v33 = 1;
+let v34 = 1;
+let v35 = 1;
+let v36 = 1;
+let v37 = 1;
+let v38 = 1;
+let v39 = 1;
+let v40 = 1;
+let v41 = 1;
+let v42 = 1;
+let v43 = 1;
+let v44 = 1;
+let v45 = 1;
+let v46 = 1;
+let v47 = 1;
+let v48 = 1;
+let v49 = 1;
+let v50 = 1;
+---
+RangeError: ran out of registers!!
+fail/reg-max.rnp:52:5
+let v50 = 1;
+    ^^^

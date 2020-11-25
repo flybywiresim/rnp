@@ -3,11 +3,10 @@
   "main": "src/index.js",
   "description": "RNP is a language which compiles to [RPN][], a scripting language used by MSFS.",
   "version": "1.0.0",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint --cache src test .eslintrc.js",
+    "test": "tap --100",
+    "coverage": "tap --coverage-report=html"
   },
   "repository": {
     "type": "git",
@@ -18,5 +17,13 @@
   "bugs": {
     "url": "https://github.com/devsnek/rnp/issues"
   },
-  "homepage": "https://github.com/devsnek/rnp#readme"
+  "homepage": "https://github.com/devsnek/rnp#readme",
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/eslint-parser": "^7.12.1",
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "tap": "^14.11.0"
+  }
 }

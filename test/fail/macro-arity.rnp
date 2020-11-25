@@ -1,0 +1,9 @@
+macro add($a, $b) {
+}
+
+let z = add(1);
+---
+SyntaxError: Macro expected 2 arguments
+fail/macro-arity.rnp:4:9
+let z = add(1);
+        ^^^^^^

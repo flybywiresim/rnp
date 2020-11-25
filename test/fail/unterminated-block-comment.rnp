@@ -1,0 +1,6 @@
+#*
+---
+SyntaxError: Unterminated block comment
+fail/unterminated-block-comment.rnp:1:3
+#*
+  ^

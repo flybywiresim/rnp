@@ -1,0 +1,6 @@
+'hi' + 'hi'
+---
+TypeError: + expected number but got string
+fail/binop-t.rnp:1:1
+'hi' + 'hi'
+^^^^

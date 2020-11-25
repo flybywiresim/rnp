@@ -7,7 +7,7 @@ comment 3; *#
 #*
 nested
 #*
-block
+block * #
 *#
 5;
 comment

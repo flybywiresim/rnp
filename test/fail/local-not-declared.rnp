@@ -1,0 +1,6 @@
+1 + a;
+---
+ReferenceError: a is not declared
+fail/local-not-declared.rnp:1:5
+1 + a;
+    ^

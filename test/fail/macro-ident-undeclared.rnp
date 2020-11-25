@@ -1,0 +1,9 @@
+macro x() {
+  $a
+}
+x();
+---
+ReferenceError: $a is not declared
+fail/macro-ident-undeclared.rnp:2:3
+  $a
+  ^^
