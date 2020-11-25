@@ -62,12 +62,26 @@ let a = 1;
 
 #### Macros
 
-Declare a macro.
+Declare a macro. Macros may be exported and used in other files using `import`.
 
 ```rnp
 macro add($a, $b) {
   $a + $b
 }
+```
+
+```rnp
+export macro sub($a, $b) {
+  $a + $b
+}
+```
+
+#### Imports
+
+Macros can be imported from other files using `import`.
+
+```rnp
+import { sub } from './file.rnp';
 ```
 
 ### Assignments

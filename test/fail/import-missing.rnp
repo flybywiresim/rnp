@@ -1,0 +1,6 @@
+import { x } from './module-FIXTURE.rnp';
+---
+ReferenceError: ./module-FIXTURE.rnp does not export x
+fail/import-missing.rnp:1:10
+import { x } from './module-FIXTURE.rnp';
+         ^

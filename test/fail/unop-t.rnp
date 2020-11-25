@@ -1,6 +1,6 @@
-~true
+~true;
 ---
 TypeError: ~ expected number but got boolean
 fail/unop-t.rnp:1:2
-~true
+~true;
  ^^^^

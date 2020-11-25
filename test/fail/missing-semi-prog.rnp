@@ -1,0 +1,6 @@
+{ 1 }
+---
+SyntaxError: Missing semicolon at end of program
+fail/missing-semi-prog.rnp:1:6
+{ 1 }
+     ^

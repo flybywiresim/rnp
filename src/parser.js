@@ -11,6 +11,7 @@ class Parser extends Lexer {
     super(source);
     this.specifier = specifier;
     this.insideMacro = false;
+    this.isTopLevel = true;
   }
 
   static parse(source, specifier) {
@@ -144,14 +145,18 @@ ${e.stack}`;
   }
 
   // Statement :
+  //   ImportDeclaration
   //   LocalDeclaration
   //   MacroDeclaration
   //   Assignment
   //   Expression `;`
   parseStatement(end) {
     switch (this.peek().type) {
+      case Token.IMPORT:
+        return this.parseImportDeclaration();
       case Token.LET:
         return this.parseLocalDeclaration();
+      case Token.EXPORT:
       case Token.MACRO:
         if (this.insideMacro) {
           this.raise('Cannot declare macro inside macro');
@@ -167,14 +172,34 @@ ${e.stack}`;
           node.expression = expr;
           return this.finishNode(node, 'Drop');
         }
-        if (expr.type === 'IfExpression') {
+        if (expr.type === 'IfExpression' || expr.type === 'Block') {
           expr.statementWithoutSemicolon = true;
-        } else if (!this.test(end)) {
+        } else if (end === Token.EOS || !this.test(end)) {
           this.expect(Token.SEMICOLON);
         }
         return expr;
       }
     }
+  }
+
+  // ImportDeclaration :
+  //   `import` `{` names `}` from StringLiteral `;`
+  parseImportDeclaration() {
+    const node = this.startNode();
+    this.expect(Token.IMPORT);
+    this.expect(Token.LBRACE);
+    node.imports = [];
+    while (!this.eat(Token.RBRACE)) {
+      node.imports.push(this.parseIdentifier());
+      if (this.eat(Token.RBRACE)) {
+        break;
+      }
+      this.expect(Token.COMMA);
+    }
+    this.expect(Token.FROM);
+    node.specifier = this.parseStringLiteral();
+    this.expect(Token.SEMICOLON);
+    return this.finishNode(node, 'ImportDeclaration');
   }
 
   // LocalDeclaration :
@@ -190,9 +215,10 @@ ${e.stack}`;
   }
 
   // MacroDeclaration :
-  //   `macro` Identifier `(` Parameters `)` Block
+  //   `export`? `macro` Identifier `(` Parameters `)` Block
   parseMacroDeclaration() {
     const node = this.startNode();
+    node.isExported = this.isTopLevel && this.eat(Token.EXPORT);
     this.expect(Token.MACRO);
     node.name = this.parseIdentifier();
     this.expect(Token.LPAREN);
@@ -327,11 +353,8 @@ ${e.stack}`;
         node.value = this.next().value;
         return this.finishNode(node, 'NumberLiteral');
       }
-      case Token.STRING: {
-        const node = this.startNode();
-        node.value = this.next().value;
-        return this.finishNode(node, 'StringLiteral');
-      }
+      case Token.STRING:
+        return this.parseStringLiteral();
       case Token.LPAREN: {
         this.next();
         const node = this.parseExpression();
@@ -368,6 +391,14 @@ ${e.stack}`;
     return this.finishNode(node, 'MacroIdentifier');
   }
 
+  // StringLiteral :
+  //   `'` any chars `'`
+  parseStringLiteral() {
+    const node = this.startNode();
+    node.value = this.expect(Token.STRING).value;
+    return this.finishNode(node, 'StringLiteral');
+  }
+
   // IfExpression :
   //   `if` Expression Block [lookahead != `else`]
   //   `if` Expression Block `else` Block
@@ -391,7 +422,10 @@ ${e.stack}`;
   parseBlock() {
     const node = this.startNode();
     this.expect(Token.LBRACE);
+    const oldToplevel = this.isTopLevel;
+    this.isTopLevel = false;
     node.statements = this.parseStatementList(Token.RBRACE);
+    this.isTopLevel = oldToplevel;
     return this.finishNode(node, 'Block');
   }
 }

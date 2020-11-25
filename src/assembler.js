@@ -1,6 +1,7 @@
 'use strict';
 
 const { OperatorOverload } = require('./lexer');
+const { Parser } = require('./parser');
 
 class Type {
   constructor(name) {
@@ -64,30 +65,52 @@ const formatSimVar = (s) => {
 const REGISTER_MAX = 50;
 
 class Assembler {
-  constructor(source, specifier) {
+  constructor(source, specifier, getSource) {
     this.source = source;
     this.specifier = specifier;
+    this.getSource = getSource;
+    this.exports = new Map();
     this.output = [];
     this.stack = [];
     this.scopes = [];
     this.registerIndex = 0;
   }
 
-  static assemble(ast, source, specifier) {
-    const a = new Assembler(source, specifier);
+  static assemble(ast, ...args) {
+    const a = new Assembler(...args);
     a.visit(ast);
-    return a.output.join(' ');
+    if (a.pop() !== Type.VOID) {
+      a.raise(SyntaxError, 'Missing semicolon at end of program', a.source.length);
+    }
+    return a.getOutput();
   }
 
-  raise(T, message, node) {
-    const {
-      startIndex,
-      endIndex,
-      start: {
-        line,
-        column,
-      },
-    } = node.location;
+  raise(T, message, context) {
+    let startIndex;
+    let endIndex;
+    let line;
+    let column;
+    if (typeof context === 'number') {
+      line = this.source.split('\n').length;
+      /* istanbul ignore next */
+      if (context === this.source.length) {
+        while (this.source[context - 1] === '\n') {
+          line -= 1;
+          context -= 1;
+        }
+      }
+      startIndex = context;
+      endIndex = context + 1;
+    } else {
+      ({
+        startIndex,
+        endIndex,
+        start: {
+          line,
+          column,
+        },
+      } = context.location);
+    }
 
     let lineStart = startIndex;
     while (this.source[lineStart - 1] !== '\n' && this.source[lineStart - 1] !== undefined) {
@@ -97,6 +120,10 @@ class Assembler {
     let lineEnd = startIndex;
     while (this.source[lineEnd] !== '\n' && this.source[lineEnd] !== undefined) {
       lineEnd += 1;
+    }
+
+    if (column === undefined) {
+      column = startIndex - lineStart + 1;
     }
 
     const e = new T(message);
@@ -115,6 +142,10 @@ ${e.stack}`;
 
   emit(s) {
     this.output.push(s);
+  }
+
+  getOutput() {
+    return this.output.join(' ');
   }
 
   pushScope() {
@@ -175,6 +206,21 @@ ${e.stack}`;
     this.popScope();
   }
 
+  visitImportDeclaration(node) {
+    const { source, specifier } = this.getSource(this.specifier, node.specifier.value);
+    const ast = Parser.parse(source, specifier);
+    const a = new Assembler(source, specifier, this.getSource);
+    a.visit(ast);
+    for (const i of node.imports) {
+      if (!a.exports.has(i.value)) {
+        this.raise(ReferenceError, `${node.specifier.value} does not export ${i.value}`, i);
+      }
+      if (!this.declare(i.value, a.exports.get(i.value))) {
+        this.raise(SyntaxError, `Cannot shadow or redeclare ${i.value}`, i);
+      }
+    }
+  }
+
   visitLocalDeclaration(node) {
     this.visit(node.value);
     const t0 = this.pop();
@@ -195,6 +241,9 @@ ${e.stack}`;
   visitMacroDeclaration(node) {
     if (!this.declare(node.name.value, node)) {
       this.raise(SyntaxError, `Cannot shadow or redeclare ${node.name.value}`, node.name);
+    }
+    if (node.isExported) {
+      this.exports.set(node.name.value, node);
     }
   }
 

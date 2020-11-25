@@ -1,0 +1,4 @@
+import { add } from './module-FIXTURE.rnp';
+add(1, 2);
+---
+1 2 + p

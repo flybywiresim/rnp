@@ -49,6 +49,9 @@ const LexTree = {};
   ['MACRO', 'macro'],
   ['TRUE', 'true'],
   ['FALSE', 'false'],
+  ['IMPORT', 'import'],
+  ['EXPORT', 'export'],
+  ['FROM', 'from'],
 
   // Other
   ['NUMBER', null],
