@@ -1,0 +1,22 @@
+{
+  "name": "rnp",
+  "main": "src/index.js",
+  "description": "RNP is a language which compiles to [RPN][], a scripting language used by MSFS.",
+  "version": "1.0.0",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devsnek/rnp.git"
+  },
+  "author": "snek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devsnek/rnp/issues"
+  },
+  "homepage": "https://github.com/devsnek/rnp#readme"
+}
