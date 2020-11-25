@@ -1,0 +1,7 @@
+macro x($a, $a) {}
+x(1, 1);
+---
+SyntaxError: Cannot shadow or redeclare $a
+fail/macro-param-redeclare.rnp:1:13
+macro x($a, $a) {}
+            ^^

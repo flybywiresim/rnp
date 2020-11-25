@@ -1,9 +1,7 @@
 let a = 1;
-{
-  let a = 1;
-}
+macro a() {}
 ---
 SyntaxError: Cannot shadow or redeclare a
-fail/local-shadow.rnp:3:7
-  let a = 1;
+fail/macro-redeclare.rnp:2:7
+macro a() {}
       ^

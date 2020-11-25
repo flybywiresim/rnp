@@ -141,12 +141,13 @@ ${e.stack}`;
   }
 
   declare(name, data) {
-    this.scopes.forEach((s) => {
-      if (s.has(name)) {
-        throw new SyntaxError(`Cannot shadow or redeclare ${name}`);
+    for (const scope of this.scopes) {
+      if (scope.has(name)) {
+        return false;
       }
-    });
+    }
     this.scopes[this.scopes.length - 1].set(name, data);
+    return true;
   }
 
   resolve(name) {
@@ -184,13 +185,17 @@ ${e.stack}`;
     if (register >= REGISTER_MAX) {
       this.raise(RangeError, 'ran out of registers!!', node.name);
     }
-    this.declare(node.name.value, { register, type: t0 });
+    if (!this.declare(node.name.value, { register, type: t0 })) {
+      this.raise(SyntaxError, `Cannot shadow or redeclare ${node.name.value}`, node.name);
+    }
     this.registerIndex += 1;
     this.emit(`sp${register}`);
   }
 
   visitMacroDeclaration(node) {
-    this.declare(node.name.value, node);
+    if (!this.declare(node.name.value, node)) {
+      this.raise(SyntaxError, `Cannot shadow or redeclare ${node.name.value}`, node.name);
+    }
   }
 
   visitMacroExpansion(node) {
@@ -204,7 +209,9 @@ ${e.stack}`;
     this.pushScope();
     macro.parameters.forEach((p, i) => {
       const a = node.arguments[i];
-      this.declare(p.value, a);
+      if (!this.declare(p.value, a)) {
+        this.raise(SyntaxError, `Cannot shadow or redeclare ${p.value}`, p);
+      }
     });
     this.visit(macro.body);
     this.popScope();
