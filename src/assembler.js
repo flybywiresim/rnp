@@ -364,6 +364,70 @@ ${e.stack}`;
     this.push(o);
   }
 
+  visitMethodExpression(node) {
+    const ops = {
+      abs: ['abs', Type.NUMBER, [], Type.NUMBER],
+      floor: ['flr', Type.NUMBER, [], Type.NUMBER],
+      range: ['rng', Type.NUMBER, [Type.NUMBER, Type.NUMBER], Type.NUMBER],
+      cos: ['cos', Type.NUMBER, [], Type.NUMBER],
+      min: ['min', Type.NUMBER, [Type.NUMBER], Type.NUMBER],
+      sin: ['sin', Type.NUMBER, [], Type.NUMBER],
+      acos: ['acos', Type.NUMBER, [], Type.NUMBER],
+      ctg: ['ctg', Type.NUMBER, [], Type.NUMBER],
+      ln: ['ln', Type.NUMBER, [], Type.NUMBER],
+      square: ['sqr', Type.NUMBER, [], Type.NUMBER],
+      asin: ['asin', Type.NUMBER, [], Type.NUMBER],
+      eps: ['eps', Type.NUMBER, [], Type.NUMBER],
+      log: ['log', Type.NUMBER, [Type.NUMBER], Type.NUMBER],
+      sqrt: ['sqrt', Type.NUMBER, [], Type.NUMBER],
+      atg2: ['atg2', Type.NUMBER, [Type.NUMBER], Type.NUMBER],
+      exp: ['exp', Type.NUMBER, [], Type.NUMBER],
+      max: ['max', Type.NUMBER, [Type.NUMBER], Type.NUMBER],
+      tan: ['tg', Type.NUMBER, [], Type.NUMBER],
+      atan: ['atg', Type.NUMBER, [], Type.NUMBER],
+      d360: ['d360', Type.NUMBER, [], Type.NUMBER],
+      toDegrees: ['rddg', Type.NUMBER, [], Type.NUMBER],
+      toRadians: ['dgrd', Type.NUMBER, [], Type.NUMBER],
+      rnor: ['rnor', Type.NUMBER, [], Type.NUMBER],
+      toLowerCase: ['lc', Type.STRING, [], Type.STRING],
+      toUpperCase: ['uc', Type.STRING, [], Type.STRING],
+    };
+    if (ops[node.name.value]) {
+      const [raw, self, args, ret] = ops[node.name.value];
+
+      const checkSelf = () => {
+        this.visit(node.callee);
+        const t0 = this.pop();
+        if (t0 !== self) {
+          this.raise(TypeError, `${node.name.value} expected ${self} but got ${t0}`, node.callee);
+        }
+      };
+      if (node.name.value !== 'range') {
+        checkSelf();
+      }
+
+      if (args.length !== node.arguments.length) {
+        this.raise(TypeError, `${node.name.value} expected ${args.length} arguments`, node);
+      }
+      node.arguments.forEach((a, i) => {
+        this.visit(a);
+        const t = this.pop();
+        if (t !== args[i]) {
+          this.raise(TypeError, `Expected ${args[i]} but got ${t}`, a);
+        }
+      });
+
+      if (node.name.value === 'range') {
+        checkSelf();
+      }
+
+      this.emit(raw);
+      this.push(ret);
+    } else {
+      this.raise(TypeError, `${node.name.value} is not a valid operator`, node.name);
+    }
+  }
+
   visitIdentifier(node) {
     const local = this.resolve(node.value);
     if (local === null) {

@@ -1,0 +1,6 @@
+'hello'.floor();
+---
+TypeError: floor expected number but got string
+fail/stdop-t.rnp:1:1
+'hello'.floor();
+^^^^^^^

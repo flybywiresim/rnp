@@ -67,6 +67,7 @@ const LexTree = {};
   ['RPAREN', ')'],
   ['LBRACE', '{'],
   ['RBRACE', '}'],
+  ['PERIOD', '.'],
 ].forEach(([name, v, prec, overload], i) => {
   Token[name] = i;
   TokenNames[i] = name;
@@ -315,7 +316,8 @@ class Lexer {
         break;
       }
     }
-    if (base === 10 && this.source[this.position] === '.') {
+    if (base === 10 && this.source[this.position] === '.'
+        && check(this.source[this.position + 1])) {
       this.position += 1;
       while (this.position < this.source.length) {
         if (check(this.source[this.position])) {

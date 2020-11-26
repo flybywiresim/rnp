@@ -13,7 +13,7 @@ the future it may also perform optimization.
 - `any` - Used for unknown types. No builtin in the language allows this type,
    but some expressions may be valid with it, for example `(L:X) = (L:Y)`.
 - `void` - The absence of a value. An example of an expression which produces
-  `void` is `if {}`.
+  `void` is `if true {}`.
 
 ## Syntax
 
@@ -189,6 +189,19 @@ Mathematical and relational operations.
 !true
 ~1
 # etc...
+```
+
+#### Method Operations
+
+RPN provides several standard operations. These operations are available in
+RNP as method-ish syntax.
+
+```rnp
+8.log(2);
+```
+
+```rnp
+'hello'.toUpperCase();
 ```
 
 [RPN]: https://www.prepar3d.com/SDKv5/sdk/scripting/rpn_scripting.html

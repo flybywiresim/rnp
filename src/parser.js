@@ -278,7 +278,7 @@ ${e.stack}`;
   }
 
   // UnaryExpression :
-  //   UnaryExpression
+  //   MethodExpression
   //   `!` UnaryExpression
   //   `~` UnaryExpression
   //   `-` UnaryExpression
@@ -292,13 +292,23 @@ ${e.stack}`;
         node.operand = this.parseUnaryExpression();
         return this.finishNode(node, 'UnaryExpression');
       default:
-        return this.parseUpdateExpression();
+        return this.parseMethodExpression();
     }
   }
 
-  // TODO: should update expressions be supported?
-  parseUpdateExpression() {
-    return this.parseMacroExpansion();
+  // MethodExpression
+  //   MacroExpansion
+  //   MacroExpansion `.` Identifier `(` Arguments `)`
+  parseMethodExpression() {
+    const left = this.parseMacroExpansion();
+    if (this.eat(Token.PERIOD)) {
+      const node = this.startNode(left);
+      node.callee = left;
+      node.name = this.parseIdentifier();
+      node.arguments = this.parseArguments();
+      return this.finishNode(node, 'MethodExpression');
+    }
+    return left;
   }
 
   // MacroExpansion :
@@ -306,20 +316,31 @@ ${e.stack}`;
   //   Identifier `(` Arguments `)`
   parseMacroExpansion() {
     const left = this.parsePrimaryExpression();
-    if (left.type === 'Identifier' && this.eat(Token.LPAREN)) {
+    if (left.type === 'Identifier' && this.test(Token.LPAREN)) {
       const node = this.startNode(left);
       node.name = left;
-      node.arguments = [];
-      while (!this.eat(Token.RPAREN)) {
-        node.arguments.push(this.parseExpression());
-        if (this.eat(Token.RPAREN)) {
-          break;
-        }
-        this.expect(Token.COMMA);
-      }
+      node.arguments = this.parseArguments();
       return this.finishNode(node, 'MacroExpansion');
     }
     return left;
+  }
+
+  // Arguments :
+  //   `(` ArgumentList `,`? `)`
+  // ArgumentList :
+  //   Expression
+  //   ArgumentList `,` Expression
+  parseArguments() {
+    this.expect(Token.LPAREN);
+    const args = [];
+    while (!this.eat(Token.RPAREN)) {
+      args.push(this.parseExpression());
+      if (this.eat(Token.RPAREN)) {
+        break;
+      }
+      this.expect(Token.COMMA);
+    }
+    return args;
   }
 
   // PrimaryExpression :

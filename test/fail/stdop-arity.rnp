@@ -1,0 +1,6 @@
+1.floor(1);
+---
+TypeError: floor expected 0 arguments
+fail/stdop-arity.rnp:1:1
+1.floor(1);
+^^^^^^^^^^
