@@ -214,6 +214,8 @@ class Lexer {
       endIndex: this.position,
       line: this.lineForNextToken,
       column: this.columnForNextToken,
+      endLine: this.line,
+      endColumn: this.position - this.columnOffset + 1,
     };
   }
 

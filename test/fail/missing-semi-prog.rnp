@@ -1,6 +1,7 @@
 { 1 }
 ---
-SyntaxError: Missing semicolon at end of program
-fail/missing-semi-prog.rnp:1:6
-{ 1 }
-     ^
+TypeError: Expected void but got number
+fail/missing-semi-prog.rnp:1:1
+> 1 | { 1 }
+    | ^^^^^ Expected void but got number
+  2 | 

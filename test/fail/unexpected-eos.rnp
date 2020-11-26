@@ -2,5 +2,6 @@ let a
 ---
 SyntaxError: Unexpected end of source
 fail/unexpected-eos.rnp:1:6
-let a
-     ^
+> 1 | let a
+    |      ^ Unexpected end of source
+  2 | 

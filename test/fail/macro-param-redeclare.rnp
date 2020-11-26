@@ -3,5 +3,7 @@ x(1, 1);
 ---
 SyntaxError: Cannot shadow or redeclare $a
 fail/macro-param-redeclare.rnp:1:13
-macro x($a, $a) {}
-            ^^
+> 1 | macro x($a, $a) {}
+    |             ^^ Cannot shadow or redeclare $a
+  2 | x(1, 1);
+  3 | 

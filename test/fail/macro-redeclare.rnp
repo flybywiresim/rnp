@@ -3,5 +3,7 @@ macro a() {}
 ---
 SyntaxError: Cannot shadow or redeclare a
 fail/macro-redeclare.rnp:2:7
-macro a() {}
-      ^
+  1 | let a = 1;
+> 2 | macro a() {}
+    |       ^ Cannot shadow or redeclare a
+  3 | 

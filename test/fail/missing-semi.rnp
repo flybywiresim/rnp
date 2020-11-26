@@ -1,7 +1,9 @@
-1
-2
+11 + 11
+22 + 22
 ---
-SyntaxError: Unexpected token
-fail/missing-semi.rnp:2:1
-2
-^
+SyntaxError: Expected semicolon after expression
+fail/missing-semi.rnp:1:8
+> 1 | 11 + 11
+    |        ^ Expected semicolon after expression
+  2 | 22 + 22
+  3 | 

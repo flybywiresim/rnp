@@ -30,15 +30,20 @@ if (require.main === module) {
     };
   };
 
-  repl.start({
-    prompt: '> ',
-    eval(source, c, f, cb) {
-      try {
-        cb(null, translate(source, '(repl)', getSource));
-      } catch (e) {
-        cb(e, null);
-      }
-    },
-    writer: (v) => (typeof v === 'string' ? v : util.inspect(v)),
-  });
+  if (process.argv[2]) {
+    const out = translate(getSource('.', process.argv[2]).source, process.argv[2], getSource);
+    process.stdout.write(out);
+  } else {
+    repl.start({
+      prompt: '> ',
+      eval(source, c, f, cb) {
+        try {
+          cb(null, translate(source, '(repl)', getSource));
+        } catch (e) {
+          cb(e, null);
+        }
+      },
+      writer: (v) => (typeof v === 'string' ? v : util.inspect(v)),
+    });
+  }
 }

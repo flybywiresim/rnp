@@ -2,5 +2,6 @@
 ---
 TypeError: ~ expected number but got boolean
 fail/unop-t.rnp:1:2
-~true;
- ^^^^
+> 1 | ~true;
+    |  ^^^^ ~ expected number but got boolean
+  2 | 

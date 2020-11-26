@@ -5,6 +5,7 @@ const {
   Token,
   TokenPrecedence,
 } = require('./lexer');
+const codeFrame = require('./code-frame');
 
 class Parser extends Lexer {
   constructor(source, specifier) {
@@ -19,59 +20,34 @@ class Parser extends Lexer {
     return p.parseProgram();
   }
 
-  raise(m, c = this.peek()) {
-    let context = c;
-    let message = m;
-
+  raise(message, context = this.peek()) {
     if (context.type === Token.EOS && message === 'Unexpected token') {
       message = 'Unexpected end of source';
     }
 
-    let startIndex;
-    let endIndex;
     let line;
-    let column;
-    if (typeof context === 'number') {
+    let startColumn;
+    let endColumn;
+
+    if (typeof context === 'number' || context.type === Token.EOS) {
       line = this.line;
-      if (context === this.source.length) {
-        while (this.source[context - 1] === '\n') {
+      let startIndex = typeof context === 'number' ? context : context.startIndex;
+      if (startIndex === this.source.length) {
+        while (this.source[startIndex - 1] === '\n') {
           line -= 1;
-          context -= 1;
+          startIndex -= 1;
         }
+        startColumn = startIndex - this.source.lastIndexOf('\n', startIndex - 1);
+      } else {
+        startColumn = startIndex - this.columnOffset + 1;
       }
-      startIndex = context;
-      endIndex = context + 1;
-    } else if (context.type === Token.EOS) {
-      line = this.line;
-      startIndex = context.startIndex;
-      while (this.source[startIndex - 1] === '\n') {
-        line -= 1;
-        startIndex -= 1;
-      }
-      endIndex = startIndex + 1;
+      endColumn = startColumn + 1;
     } else {
       ({
-        startIndex,
-        endIndex,
-        start: {
-          line,
-          column,
-        } = context,
+        line,
+        column: startColumn,
+        endColumn,
       } = context);
-    }
-
-    let lineStart = startIndex;
-    while (this.source[lineStart - 1] !== '\n' && this.source[lineStart - 1] !== undefined) {
-      lineStart -= 1;
-    }
-
-    let lineEnd = startIndex;
-    while (this.source[lineEnd] !== '\n' && this.source[lineEnd] !== undefined) {
-      lineEnd += 1;
-    }
-
-    if (column === undefined) {
-      column = startIndex - lineStart + 1;
     }
 
     const e = new SyntaxError(message);
@@ -79,9 +55,17 @@ class Parser extends Lexer {
     Error.prepareStackTrace = (error, trace) => `    at ${trace.join('\n    at ')}`;
     e.stack = `\
 ${e.name}: ${e.message}
-${this.specifier}:${line}:${column}
-${this.source.slice(lineStart, lineEnd)}
-${' '.repeat(startIndex - lineStart)}${'^'.repeat(Math.max(endIndex - startIndex, 1))}
+${this.specifier}:${line}:${startColumn}
+${codeFrame(this.source, {
+    start: {
+      line,
+      column: startColumn,
+    },
+    end: {
+      line,
+      column: endColumn,
+    },
+  }, message)}
 ${e.stack}`;
     Error.prepareStackTrace = oldPST;
 
@@ -114,14 +98,10 @@ ${e.stack}`;
   }
 
   finishNode(node, type) {
-    // eslint-disable-next-line no-param-reassign
     node.type = type;
-    // eslint-disable-next-line no-param-reassign
     node.location.endIndex = this.currentToken.endIndex;
-    // eslint-disable-next-line no-param-reassign
-    node.location.end.line = this.currentToken.line;
-    // eslint-disable-next-line no-param-reassign
-    node.location.end.column = this.currentToken.column;
+    node.location.end.line = this.currentToken.endLine;
+    node.location.end.column = this.currentToken.endColumn;
     return node;
   }
 
@@ -149,6 +129,8 @@ ${e.stack}`;
   //   LocalDeclaration
   //   MacroDeclaration
   //   Assignment
+  //   If
+  //   Block
   //   Expression `;`
   parseStatement(end) {
     switch (this.peek().type) {
@@ -162,21 +144,33 @@ ${e.stack}`;
           this.raise('Cannot declare macro inside macro');
         }
         return this.parseMacroDeclaration();
+      case Token.IF: {
+        const expr = this.parseIf();
+        expr.statement = true;
+        return expr;
+      }
+      case Token.LBRACE: {
+        const expr = this.parseBlock();
+        expr.statement = true;
+        return expr;
+      }
       default: {
         const expr = this.parseExpression();
         if ((expr.type === 'SimVar' || expr.type === 'Identifier') && !this.test(Token.SEMICOLON) && this.test(Token.ASSIGN)) {
           return this.parseAssignment(expr);
         }
         if (this.eat(Token.SEMICOLON)) {
-          const node = this.startNode();
-          node.expression = expr;
-          return this.finishNode(node, 'Drop');
+          return expr;
         }
-        if (expr.type === 'IfExpression' || expr.type === 'Block') {
-          expr.statementWithoutSemicolon = true;
-        } else if (end === Token.EOS || !this.test(end)) {
-          this.expect(Token.SEMICOLON);
+        if (end === Token.EOS || !this.test(end)) {
+          // custom line/column for exact positioning of caret
+          this.raise('Expected semicolon after expression', {
+            line: expr.location.end.line,
+            column: expr.location.end.column,
+            endColumn: expr.location.end.column + 1,
+          });
         }
+        expr.hasSemicolon = false;
         return expr;
       }
     }
@@ -350,7 +344,7 @@ ${e.stack}`;
   //   StringLiteral
   //   `(` Expression `)`
   //   SimVar
-  //   IfExpression
+  //   If
   //
   // SimVar :
   //   `(` any char `:` any chars `)`
@@ -388,7 +382,7 @@ ${e.stack}`;
         return this.finishNode(node, 'SimVar');
       }
       case Token.IF:
-        return this.parseIfExpression();
+        return this.parseIf();
       case Token.LBRACE:
         return this.parseBlock();
       default:
@@ -420,22 +414,22 @@ ${e.stack}`;
     return this.finishNode(node, 'StringLiteral');
   }
 
-  // IfExpression :
+  // If :
   //   `if` Expression Block [lookahead != `else`]
   //   `if` Expression Block `else` Block
-  //   `if` Expression Block IfExpression
-  parseIfExpression() {
+  //   `if` Expression Block If
+  parseIf() {
     const node = this.startNode();
     this.expect(Token.IF);
-    node.statementWithoutSemicolon = false;
+    node.statement = false;
     node.test = this.parseExpression();
     node.consequent = this.parseBlock();
     if (this.eat(Token.ELSE)) {
-      node.alternative = this.test(Token.IF) ? this.parseIfExpression() : this.parseBlock();
+      node.alternative = this.test(Token.IF) ? this.parseIf() : this.parseBlock();
     } else {
       node.alternative = null;
     }
-    return this.finishNode(node, 'IfExpression');
+    return this.finishNode(node, 'If');
   }
 
   // Block :
@@ -443,6 +437,7 @@ ${e.stack}`;
   parseBlock() {
     const node = this.startNode();
     this.expect(Token.LBRACE);
+    node.statement = false;
     const oldToplevel = this.isTopLevel;
     this.isTopLevel = false;
     node.statements = this.parseStatementList(Token.RBRACE);

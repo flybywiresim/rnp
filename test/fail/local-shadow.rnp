@@ -5,5 +5,9 @@ let a = 1;
 ---
 SyntaxError: Cannot shadow or redeclare a
 fail/local-shadow.rnp:3:7
-  let a = 1;
-      ^
+  1 | let a = 1;
+  2 | {
+> 3 |   let a = 1;
+    |       ^ Cannot shadow or redeclare a
+  4 | }
+  5 | 

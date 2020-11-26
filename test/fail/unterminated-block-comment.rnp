@@ -2,5 +2,6 @@
 ---
 SyntaxError: Unterminated block comment
 fail/unterminated-block-comment.rnp:1:3
-#*
-  ^
+> 1 | #*
+    |   ^ Unterminated block comment
+  2 | 

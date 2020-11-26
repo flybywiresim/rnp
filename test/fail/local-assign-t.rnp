@@ -3,5 +3,7 @@ a = true;
 ---
 TypeError: Expected number but got boolean
 fail/local-assign-t.rnp:2:5
-a = true;
-    ^^^^
+  1 | let a = 1;
+> 2 | a = true;
+    |     ^^^^ Expected number but got boolean
+  3 | 

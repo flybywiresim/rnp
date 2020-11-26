@@ -2,5 +2,6 @@
 ---
 TypeError: + expected number but got string
 fail/binop-t.rnp:1:1
-'hi' + 'hi';
-^^^^
+> 1 | 'hi' + 'hi';
+    | ^^^^ + expected number but got string
+  2 | 

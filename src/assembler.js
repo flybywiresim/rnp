@@ -2,6 +2,7 @@
 
 const { OperatorOverload } = require('./lexer');
 const { Parser } = require('./parser');
+const codeFrame = require('./code-frame');
 
 class Type {
   constructor(name) {
@@ -79,62 +80,23 @@ class Assembler {
   static assemble(ast, ...args) {
     const a = new Assembler(...args);
     a.visit(ast);
+    /* istanbul ignore next */
     if (a.pop() !== Type.VOID) {
-      a.raise(SyntaxError, 'Missing semicolon at end of program', a.source.length);
+      throw new RangeError('invalid stack state');
     }
     return a.getOutput();
   }
 
   raise(T, message, context) {
-    let startIndex;
-    let endIndex;
-    let line;
-    let column;
-    if (typeof context === 'number') {
-      line = this.source.split('\n').length;
-      /* istanbul ignore next */
-      if (context === this.source.length) {
-        while (this.source[context - 1] === '\n') {
-          line -= 1;
-          context -= 1;
-        }
-      }
-      startIndex = context;
-      endIndex = context + 1;
-    } else {
-      ({
-        startIndex,
-        endIndex,
-        start: {
-          line,
-          column,
-        },
-      } = context.location);
-    }
-
-    let lineStart = startIndex;
-    while (this.source[lineStart - 1] !== '\n' && this.source[lineStart - 1] !== undefined) {
-      lineStart -= 1;
-    }
-
-    let lineEnd = startIndex;
-    while (this.source[lineEnd] !== '\n' && this.source[lineEnd] !== undefined) {
-      lineEnd += 1;
-    }
-
-    if (column === undefined) {
-      column = startIndex - lineStart + 1;
-    }
-
     const e = new T(message);
     const oldPST = Error.prepareStackTrace;
     Error.prepareStackTrace = (error, trace) => `    at ${trace.join('\n    at ')}`;
     e.stack = `\
 ${e.name}: ${e.message}
-${this.specifier}:${line}:${column}
-${this.source.slice(lineStart, lineEnd)}
-${' '.repeat(startIndex - lineStart)}${'^'.repeat(Math.max(endIndex - startIndex, 1))}
-${e.stack}`;
+${this.specifier}:${context.location.start.line}:${context.location.start.column}
+${codeFrame(this.source, context.location, message)}
+${e.stack}
+`;
     Error.prepareStackTrace = oldPST;
 
     throw e;
@@ -197,6 +159,12 @@ ${e.stack}`;
   visitStatementList(statements) {
     statements.forEach((s) => {
       this.visit(s);
+      if (s.hasSemicolon !== false) {
+        const t0 = this.pop();
+        if (t0 !== Type.VOID) {
+          this.emit('p');
+        }
+      }
     });
   }
 
@@ -457,7 +425,7 @@ ${e.stack}`;
     this.push(SimVarTypes[node.value.type] || Type.ANY);
   }
 
-  visitIfExpression(node) {
+  visitIf(node) {
     this.visit(node.test);
     const t = this.pop();
     if (t !== Type.BOOLEAN) {
@@ -494,9 +462,8 @@ ${e.stack}`;
     }
 
     if (t0 !== Type.VOID) {
-      if (node.statementWithoutSemicolon) {
-        // This could also automatically emit a drop, but being explicit seems better?
-        this.raise(SyntaxError, 'If expression in statement position with value must have a semicolon', node);
+      if (node.statement) {
+        this.raise(TypeError, `Expected ${Type.VOID} but got ${t0}`, node);
       }
       this.push(t0);
     }
@@ -506,13 +473,11 @@ ${e.stack}`;
     this.pushScope();
     this.visitStatementList(node.statements);
     this.popScope();
-  }
-
-  visitDrop(node) {
-    this.visit(node.expression);
-    const t0 = this.pop();
-    if (t0 !== Type.VOID) {
-      this.emit('p');
+    if (node.statement) {
+      const t0 = this.pop();
+      if (t0 !== Type.VOID) {
+        this.raise(TypeError, `Expected ${Type.VOID} but got ${t0}`, node);
+      }
     }
   }
 }

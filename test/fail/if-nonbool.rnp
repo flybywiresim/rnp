@@ -2,5 +2,6 @@ if 1 {}
 ---
 TypeError: Expected boolean but got number
 fail/if-nonbool.rnp:1:4
-if 1 {}
-   ^
+> 1 | if 1 {}
+    |    ^ Expected boolean but got number
+  2 | 

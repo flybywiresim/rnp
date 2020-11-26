@@ -2,5 +2,6 @@
 ---
 TypeError: Expected boolean but got number
 fail/simvar-assign-t.rnp:1:18
-(X:Y, boolean) = 1;
-                 ^
+> 1 | (X:Y, boolean) = 1;
+    |                  ^ Expected boolean but got number
+  2 | 

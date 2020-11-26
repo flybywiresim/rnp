@@ -2,5 +2,6 @@
 ---
 SyntaxError: Unexpected end of simvar
 fail/unterminated-simvar.rnp:1:5
-(X:Y
-    ^
+> 1 | (X:Y
+    |     ^ Unexpected end of simvar
+  2 | 

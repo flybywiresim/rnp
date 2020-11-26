@@ -2,5 +2,6 @@
 ---
 SyntaxError: Unterminated string
 fail/unterminated-string-newline.rnp:1:7
-'hello
-      ^
+> 1 | 'hello
+    |       ^ Unterminated string
+  2 | 

@@ -5,5 +5,8 @@ let z = add(1);
 ---
 SyntaxError: Macro expected 2 arguments
 fail/macro-arity.rnp:4:9
-let z = add(1);
-        ^^^^^^
+  2 | }
+  3 | 
+> 4 | let z = add(1);
+    |         ^^^^^^ Macro expected 2 arguments
+  5 | 

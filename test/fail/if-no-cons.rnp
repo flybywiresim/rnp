@@ -1,6 +1,7 @@
-if true { 1 };
+if true { 1 }
 ---
 SyntaxError: If expression with consequent value must have alternative
 fail/if-no-cons.rnp:1:1
-if true { 1 };
-^^^^^^^^^^^^^
+> 1 | if true { 1 }
+    | ^^^^^^^^^^^^^ If expression with consequent value must have alternative
+  2 | 

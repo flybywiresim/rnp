@@ -2,5 +2,6 @@
 ---
 TypeError: == expected both operands to be the same type but got number and boolean
 fail/binop-mismatch.rnp:1:1
-1 == true;
-^^^^^^^^^
+> 1 | 1 == true;
+    | ^^^^^^^^^ == expected both operands to be the same type but got number and boolean
+  2 | 
