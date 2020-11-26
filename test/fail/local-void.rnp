@@ -1,7 +1,8 @@
 let a = {};
 ---
 TypeError: Expected a value but got void
-fail/local-void.rnp:1:9
-> 1 | let a = {};
-    |         ^^ Expected a value but got void
-  2 | 
+ --> fail/local-void.rnp:1:9
+  |
+1 | let a = {};
+  |         ^^ Expected a value but got void
+  |

@@ -2,8 +2,8 @@ macro x($a, $a) {}
 x(1, 1);
 ---
 SyntaxError: Cannot shadow or redeclare $a
-fail/macro-param-redeclare.rnp:1:13
-> 1 | macro x($a, $a) {}
-    |             ^^ Cannot shadow or redeclare $a
-  2 | x(1, 1);
-  3 | 
+ --> fail/macro-param-redeclare.rnp:1:13
+  |
+1 | macro x($a, $a) {}
+  |             ^^ Cannot shadow or redeclare $a
+  |

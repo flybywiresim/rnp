@@ -1,7 +1,8 @@
 1.range('hello', 1);
 ---
 TypeError: Expected number but got string
-fail/stdop-arg-t.rnp:1:9
-> 1 | 1.range('hello', 1);
-    |         ^^^^^^^ Expected number but got string
-  2 | 
+ --> fail/stdop-arg-t.rnp:1:9
+  |
+1 | 1.range('hello', 1);
+  |         ^^^^^^^ Expected number but got string
+  |

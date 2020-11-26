@@ -4,10 +4,8 @@ macro x() {
 x();
 ---
 ReferenceError: $a is not declared
-fail/macro-ident-undeclared.rnp:2:3
-  1 | macro x() {
-> 2 |   $a
-    |   ^^ $a is not declared
-  3 | }
-  4 | x();
-  5 | 
+ --> fail/macro-ident-undeclared.rnp:2:3
+  |
+2 |   $a
+  |   ^^ $a is not declared
+  |

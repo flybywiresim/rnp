@@ -5,7 +5,7 @@ const {
   Token,
   TokenPrecedence,
 } = require('./lexer');
-const codeFrame = require('./code-frame');
+const createError = require('./util');
 
 class Parser extends Lexer {
   constructor(source, specifier) {
@@ -50,26 +50,16 @@ class Parser extends Lexer {
       } = context);
     }
 
-    const e = new SyntaxError(message);
-    const oldPST = Error.prepareStackTrace;
-    Error.prepareStackTrace = (error, trace) => `    at ${trace.join('\n    at ')}`;
-    e.stack = `\
-${e.name}: ${e.message}
-${this.specifier}:${line}:${startColumn}
-${codeFrame(this.source, {
-    start: {
-      line,
-      column: startColumn,
-    },
-    end: {
-      line,
-      column: endColumn,
-    },
-  }, message)}
-${e.stack}`;
-    Error.prepareStackTrace = oldPST;
-
-    throw e;
+    throw createError(SyntaxError, this.source, {
+      start: {
+        line,
+        column: startColumn,
+      },
+      end: {
+        line,
+        column: endColumn,
+      },
+    }, this.specifier, message);
   }
 
   unexpected(context) {

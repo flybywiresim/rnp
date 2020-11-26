@@ -1,7 +1,8 @@
 'hi' + 'hi';
 ---
-TypeError: + expected number but got string
-fail/binop-t.rnp:1:1
-> 1 | 'hi' + 'hi';
-    | ^^^^ + expected number but got string
-  2 | 
+TypeError: Expected number but got string
+ --> fail/binop-t.rnp:1:1
+  |
+1 | 'hi' + 'hi';
+  | ^^^^ Expected number but got string
+  |

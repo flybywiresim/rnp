@@ -3,9 +3,8 @@ macro a() {
 }
 ---
 SyntaxError: Cannot declare macro inside macro
-fail/macro-inside-macro.rnp:2:3
-  1 | macro a() {
-> 2 |   macro b() {}
-    |   ^^^^^ Cannot declare macro inside macro
-  3 | }
-  4 | 
+ --> fail/macro-inside-macro.rnp:2:3
+  |
+2 |   macro b() {}
+  |   ^^^^^ Cannot declare macro inside macro
+  |

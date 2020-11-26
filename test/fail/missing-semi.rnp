@@ -2,8 +2,8 @@
 22 + 22
 ---
 SyntaxError: Expected semicolon after expression
-fail/missing-semi.rnp:1:8
-> 1 | 11 + 11
-    |        ^ Expected semicolon after expression
-  2 | 22 + 22
-  3 | 
+ --> fail/missing-semi.rnp:1:8
+  |
+1 | 11 + 11
+  |        ^ Expected semicolon after expression
+  |

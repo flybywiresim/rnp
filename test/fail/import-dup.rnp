@@ -1,7 +1,8 @@
 import { add, add } from './module-FIXTURE.rnp';
 ---
 SyntaxError: Cannot shadow or redeclare add
-fail/import-dup.rnp:1:15
-> 1 | import { add, add } from './module-FIXTURE.rnp';
-    |               ^^^ Cannot shadow or redeclare add
-  2 | 
+ --> fail/import-dup.rnp:1:15
+  |
+1 | import { add, add } from './module-FIXTURE.rnp';
+  |               ^^^ Cannot shadow or redeclare add
+  |

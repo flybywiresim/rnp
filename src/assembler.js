@@ -2,7 +2,7 @@
 
 const { OperatorOverload } = require('./lexer');
 const { Parser } = require('./parser');
-const codeFrame = require('./code-frame');
+const createError = require('./util');
 
 class Type {
   constructor(name) {
@@ -88,18 +88,7 @@ class Assembler {
   }
 
   raise(T, message, context) {
-    const e = new T(message);
-    const oldPST = Error.prepareStackTrace;
-    Error.prepareStackTrace = (error, trace) => `    at ${trace.join('\n    at ')}`;
-    e.stack = `\
-${e.name}: ${e.message}
-${this.specifier}:${context.location.start.line}:${context.location.start.column}
-${codeFrame(this.source, context.location, message)}
-${e.stack}
-`;
-    Error.prepareStackTrace = oldPST;
-
-    throw e;
+    throw createError(T, this.source, context.location, this.specifier, message);
   }
 
   emit(s) {
@@ -280,7 +269,7 @@ ${e.stack}
     const [i, o] = OpTypes[node.operator];
     const t = this.pop();
     if (t !== i) {
-      this.raise(TypeError, `${node.operator} expected ${i} but got ${t}`, node.operand);
+      this.raise(TypeError, `Expected ${i} but got ${t}`, node.operand);
     }
     this.emit(OperatorOverload[node.operator] || node.operator);
     this.push(o);
@@ -292,7 +281,7 @@ ${e.stack}
     this.visit(node.right);
     const t2 = this.pop();
     if (t1 !== t2) {
-      this.raise(TypeError, `${node.operator} expected both operands to be the same type but got ${t1} and ${t2}`, node);
+      this.raise(TypeError, `Expected both operands to be the same type but got ${t1} and ${t2}`, node);
     }
     let i;
     let o;
@@ -314,7 +303,7 @@ ${e.stack}
     }
     if (t1 !== i) {
       // t2 does not need to be checked here because we checked that it == t1 above
-      this.raise(TypeError, `${node.operator} expected ${i} but got ${t1}`, node.left);
+      this.raise(TypeError, `Expected ${i} but got ${t1}`, node.left);
     }
     switch (node.operator) {
       case '==':
@@ -367,7 +356,7 @@ ${e.stack}
         this.visit(node.target);
         const t0 = this.pop();
         if (t0 !== self) {
-          this.raise(TypeError, `${node.callee.value} expected ${self} but got ${t0}`, node.target);
+          this.raise(TypeError, `Expected ${self} but got ${t0}`, node.target);
         }
       };
       if (node.callee.value !== 'range') {
@@ -375,7 +364,7 @@ ${e.stack}
       }
 
       if (args.length !== node.arguments.length) {
-        this.raise(TypeError, `${node.callee.value} expected ${args.length} arguments`, node);
+        this.raise(TypeError, `Expected ${args.length} arguments`, node);
       }
       node.arguments.forEach((a, i) => {
         this.visit(a);

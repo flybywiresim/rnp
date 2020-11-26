@@ -1,7 +1,8 @@
 1 + xyz();
 ---
 ReferenceError: xyz is not declared
-fail/macro-not-declared.rnp:1:5
-> 1 | 1 + xyz();
-    |     ^^^ xyz is not declared
-  2 | 
+ --> fail/macro-not-declared.rnp:1:5
+  |
+1 | 1 + xyz();
+  |     ^^^ xyz is not declared
+  |

@@ -1,7 +1,8 @@
 1 + a;
 ---
 ReferenceError: a is not declared
-fail/local-not-declared.rnp:1:5
-> 1 | 1 + a;
-    |     ^ a is not declared
-  2 | 
+ --> fail/local-not-declared.rnp:1:5
+  |
+1 | 1 + a;
+  |     ^ a is not declared
+  |

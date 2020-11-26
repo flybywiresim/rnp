@@ -1,7 +1,8 @@
 1.floor(1);
 ---
-TypeError: floor expected 0 arguments
-fail/stdop-arity.rnp:1:1
-> 1 | 1.floor(1);
-    | ^^^^^^^^^^ floor expected 0 arguments
-  2 | 
+TypeError: Expected 0 arguments
+ --> fail/stdop-arity.rnp:1:1
+  |
+1 | 1.floor(1);
+  | ^^^^^^^^^^ Expected 0 arguments
+  |

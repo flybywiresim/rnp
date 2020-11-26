@@ -1,7 +1,8 @@
 1 == true;
 ---
-TypeError: == expected both operands to be the same type but got number and boolean
-fail/binop-mismatch.rnp:1:1
-> 1 | 1 == true;
-    | ^^^^^^^^^ == expected both operands to be the same type but got number and boolean
-  2 | 
+TypeError: Expected both operands to be the same type but got number and boolean
+ --> fail/binop-mismatch.rnp:1:1
+  |
+1 | 1 == true;
+  | ^^^^^^^^^ Expected both operands to be the same type but got number and boolean
+  |

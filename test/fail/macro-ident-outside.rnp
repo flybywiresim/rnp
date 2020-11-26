@@ -1,7 +1,8 @@
 $a
 ---
 SyntaxError: Unexpected token
-fail/macro-ident-outside.rnp:1:1
-> 1 | $a
-    | ^^ Unexpected token
-  2 | 
+ --> fail/macro-ident-outside.rnp:1:1
+  |
+1 | $a
+  | ^^ Unexpected token
+  |

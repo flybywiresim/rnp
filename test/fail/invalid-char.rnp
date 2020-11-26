@@ -2,8 +2,8 @@
 let a = "owo";
 ---
 SyntaxError: Unexpected token
-fail/invalid-char.rnp:2:9
-  1 | # strings can only use single quotes
-> 2 | let a = "owo";
-    |         ^ Unexpected token
-  3 | 
+ --> fail/invalid-char.rnp:2:9
+  |
+2 | let a = "owo";
+  |         ^ Unexpected token
+  |
