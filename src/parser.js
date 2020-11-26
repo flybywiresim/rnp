@@ -315,15 +315,26 @@ class Parser extends Lexer {
   //   Expression
   //   ArgumentList `,` Expression
   parseArguments() {
-    this.expect(Token.LPAREN);
+    const startParen = this.expect(Token.LPAREN);
     const args = [];
-    while (!this.eat(Token.RPAREN)) {
+    while (!this.test(Token.RPAREN)) {
       args.push(this.parseExpression());
-      if (this.eat(Token.RPAREN)) {
+      if (this.test(Token.RPAREN)) {
         break;
       }
       this.expect(Token.COMMA);
     }
+    const endParen = this.expect(Token.RPAREN);
+    args.location = {
+      start: {
+        line: startParen.line,
+        column: startParen.column,
+      },
+      end: {
+        line: endParen.endLine,
+        column: endParen.endColumn,
+      },
+    };
     return args;
   }
 

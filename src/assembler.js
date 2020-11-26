@@ -210,7 +210,7 @@ class Assembler {
       this.raise(ReferenceError, `${node.name.value} is not declared`, node.name);
     }
     if (node.arguments.length !== macro.parameters.length) {
-      this.raise(SyntaxError, `Macro expected ${macro.parameters.length} arguments`, node);
+      this.raise(SyntaxError, `Expected ${macro.parameters.length} arguments`, node.arguments);
     }
     this.pushScope();
     macro.parameters.forEach((p, i) => {
@@ -364,7 +364,7 @@ class Assembler {
       }
 
       if (args.length !== node.arguments.length) {
-        this.raise(TypeError, `Expected ${args.length} arguments`, node);
+        this.raise(TypeError, `Expected ${args.length} arguments`, node.arguments);
       }
       node.arguments.forEach((a, i) => {
         this.visit(a);

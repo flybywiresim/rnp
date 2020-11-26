@@ -25,12 +25,15 @@ ${pad} |`;
       const lineNum = location.start.line + index;
       const start = `${lineNum.toString().padStart(lineNumMaxWidth, ' ')} | `;
       if (index === 0) {
-        return `${start}    ${line}\n${pad} |  ---${'-'.repeat(location.start.column - 1)}^`;
+        if (location.start.column === 1) {
+          return `${start}/ ${line}`;
+        }
+        return `${start}  ${line}\n${pad} | --${'-'.repeat(location.start.column - 1)}^`;
       }
       if (index === lines.length - 1) {
-        return `${start}|   ${line}\n${pad} | |___${'_'.repeat(location.end.column - 2)}^ ${message}`;
+        return `${start}| ${line}\n${pad} | |_${'_'.repeat(location.end.column - 2)}^ ${message}`;
       }
-      return `${start}|   ${line}`;
+      return `${start}| ${line}`;
     })
     .join('\n');
 
