@@ -298,15 +298,15 @@ ${e.stack}`;
 
   // MethodExpression
   //   MacroExpansion
-  //   MacroExpansion `.` Identifier `(` Arguments `)`
+  //   MethodExpression `.` Identifier `(` Arguments `)`
   parseMethodExpression() {
-    const left = this.parseMacroExpansion();
-    if (this.eat(Token.PERIOD)) {
+    let left = this.parseMacroExpansion();
+    while (this.eat(Token.PERIOD)) {
       const node = this.startNode(left);
-      node.callee = left;
-      node.name = this.parseIdentifier();
+      node.target = left;
+      node.callee = this.parseIdentifier();
       node.arguments = this.parseArguments();
-      return this.finishNode(node, 'MethodExpression');
+      left = this.finishNode(node, 'MethodExpression');
     }
     return left;
   }

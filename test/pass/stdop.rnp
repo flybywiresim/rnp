@@ -1,7 +1,9 @@
 1.log(2);
 5.range(1, 10);
 'hello'.toUpperCase();
+2.toRadians().toDegrees();
 ---
 1 2 log p
 1 10 5 rng p
 'hello' uc p
+2 dgrd rddg p

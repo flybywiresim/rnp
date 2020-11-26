@@ -392,22 +392,22 @@ ${e.stack}`;
       toLowerCase: ['lc', Type.STRING, [], Type.STRING],
       toUpperCase: ['uc', Type.STRING, [], Type.STRING],
     };
-    if (ops[node.name.value]) {
-      const [raw, self, args, ret] = ops[node.name.value];
+    if (ops[node.callee.value]) {
+      const [raw, self, args, ret] = ops[node.callee.value];
 
       const checkSelf = () => {
-        this.visit(node.callee);
+        this.visit(node.target);
         const t0 = this.pop();
         if (t0 !== self) {
-          this.raise(TypeError, `${node.name.value} expected ${self} but got ${t0}`, node.callee);
+          this.raise(TypeError, `${node.callee.value} expected ${self} but got ${t0}`, node.target);
         }
       };
-      if (node.name.value !== 'range') {
+      if (node.callee.value !== 'range') {
         checkSelf();
       }
 
       if (args.length !== node.arguments.length) {
-        this.raise(TypeError, `${node.name.value} expected ${args.length} arguments`, node);
+        this.raise(TypeError, `${node.callee.value} expected ${args.length} arguments`, node);
       }
       node.arguments.forEach((a, i) => {
         this.visit(a);
@@ -417,14 +417,14 @@ ${e.stack}`;
         }
       });
 
-      if (node.name.value === 'range') {
+      if (node.callee.value === 'range') {
         checkSelf();
       }
 
       this.emit(raw);
       this.push(ret);
     } else {
-      this.raise(TypeError, `${node.name.value} is not a valid operator`, node.name);
+      this.raise(TypeError, `${node.callee.value} is not a valid operator`, node.callee);
     }
   }
 
