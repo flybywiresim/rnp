@@ -146,7 +146,8 @@ class Parser extends Lexer {
       }
       default: {
         const expr = this.parseExpression();
-        if ((expr.type === 'SimVar' || expr.type === 'Identifier') && !this.test(Token.SEMICOLON) && this.test(Token.ASSIGN)) {
+        if ((expr.type === 'SimVar' || expr.type === 'Identifier')
+            && TokenPrecedence[this.peek().type] === TokenPrecedence.ASSIGN) {
           return this.parseAssignment(expr);
         }
         if (this.eat(Token.SEMICOLON)) {
@@ -224,13 +225,22 @@ class Parser extends Lexer {
   }
 
   // Assignment :
-  //   SimVar `=` Expression `;`
-  //   Identifier `=` Expression `;`
+  //   SimVar = Expression `;`
+  //   Identifier = Expression `;`
+  //   SimVar @= Expression `;`
+  //   Identifier @= Expression `;`
   parseAssignment(left) {
     const node = this.startNode(left);
     node.left = left;
-    this.expect(Token.ASSIGN);
-    node.right = this.parseExpression();
+    if (this.eat(Token.ASSIGN)) {
+      node.right = this.parseExpression();
+    } else {
+      const binop = this.startNode();
+      binop.left = left;
+      binop.operator = this.next().value.slice(0, -1);
+      binop.right = this.parseExpression();
+      node.right = this.finishNode(binop, 'BinaryExpression');
+    }
     this.expect(Token.SEMICOLON);
     return this.finishNode(node, 'Assignment');
   }
@@ -238,7 +248,7 @@ class Parser extends Lexer {
   // Expression :
   //   AssignmentExpression
   parseExpression() {
-    return this.parseBinaryExpression(TokenPrecedence.BIT_OR);
+    return this.parseBinaryExpression(TokenPrecedence.OR);
   }
 
   // BinaryExpression :

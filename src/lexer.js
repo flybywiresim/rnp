@@ -11,16 +11,10 @@ const OperatorOverload = {};
 
 const LexTree = {};
 
-[
-  ['ASSIGN', '=', 2],
-
-  // Relational
-  ['EQ', '==', 9],
-  ['NE', '!=', 9],
-  ['LT', '<', 10],
-  ['GT', '>', 10],
-  ['LTE', '<=', 10],
-  ['GTE', '>=', 10],
+const MaybeAssignTokens = [
+  // Logical
+  ['OR', '||', 4],
+  ['AND', '&&', 5],
 
   // Binop
   ['BIT_OR', '|', 6],
@@ -37,6 +31,21 @@ const LexTree = {};
   // Unop
   ['ADD', '+', 12],
   ['SUB', '-', 12],
+];
+
+[
+  ['ASSIGN', '=', 2],
+  ...MaybeAssignTokens.map((t) => [`ASSIGN_${t[0]}`, `${t[1]}=`, 2]),
+
+  // Relational
+  ['EQ', '==', 9],
+  ['NE', '!=', 9],
+  ['LT', '<', 10],
+  ['GT', '>', 10],
+  ['LTE', '<=', 10],
+  ['GTE', '>=', 10],
+
+  ...MaybeAssignTokens,
 
   // Operators
   ['NOT', '!'],
