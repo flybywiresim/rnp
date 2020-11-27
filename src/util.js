@@ -1,6 +1,6 @@
 'use strict';
 
-function codeFrame(source, location, specifier, message) {
+function createMessage(source, location, specifier, message) {
   if (location.start.line === location.end.line) {
     const offset = location.start.column - 1;
     const length = location.end.column - location.start.column;
@@ -50,10 +50,10 @@ function createError(T, source, location, specifier, message) {
   Error.prepareStackTrace = (error, trace) => `    at ${trace.join('\n    at ')}`;
   e.stack = `\
 ${e.name}: ${e.message}
-${codeFrame(source, location, specifier, message)}
+${createMessage(source, location, specifier, message)}
 ${e.stack}`;
   Error.prepareStackTrace = oldPST;
   return e;
 }
 
-module.exports = createError;
+module.exports = { createError, createMessage };

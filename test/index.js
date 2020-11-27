@@ -30,7 +30,7 @@ for (const filename of readdir(path.join(__dirname, 'pass'))) {
   tap.test(test, (t) => { // eslint-disable-line no-loop-func
     const [source, expectedRaw] = fs.readFileSync(filename, 'utf8').split('---');
     // for the moment rnp emits a single line of code, so don't worry about newlines and such
-    const actual = translate(source, test, getSource);
+    const { output: actual } = translate(source, test, getSource);
     const expected = expectedRaw
       .trim()
       .replace(/\s*\n\s*/g, ' ');

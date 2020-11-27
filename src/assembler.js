@@ -2,7 +2,7 @@
 
 const { OperatorOverload } = require('./lexer');
 const { Parser } = require('./parser');
-const createError = require('./util');
+const { createError, createMessage } = require('./util');
 
 class Type {
   constructor(name) {
@@ -70,11 +70,12 @@ class Assembler {
     this.source = source;
     this.specifier = specifier;
     this.getSource = getSource;
-    this.exports = new Map();
+    this.warnings = [];
     this.output = [];
     this.stack = [];
     this.scopes = [];
     this.registerIndex = 0;
+    this.exports = new Map();
   }
 
   static assemble(ast, ...args) {
@@ -84,11 +85,19 @@ class Assembler {
     if (a.pop() !== Type.VOID) {
       throw new RangeError('invalid stack state');
     }
-    return a.getOutput();
+    return {
+      warnings: a.warnings,
+      output: a.getOutput(),
+    };
   }
 
   raise(T, message, context) {
     throw createError(T, this.source, context.location, this.specifier, message);
+  }
+
+  warn(message, context) {
+    const detail = createMessage(this.source, context.location, this.specifier, message);
+    this.warnings.push({ detail, message });
   }
 
   emit(s) {
@@ -151,6 +160,7 @@ class Assembler {
       if (s.hasSemicolon !== false) {
         const t0 = this.pop();
         if (t0 !== Type.VOID) {
+          this.warn('Unused value', s);
           this.emit('p');
         }
       }

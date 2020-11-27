@@ -5,8 +5,17 @@ const { Assembler } = require('./assembler');
 
 function translate(source, specifier, getSource) {
   const ast = Parser.parse(source, specifier);
-  const out = Assembler.assemble(ast, source, specifier, getSource);
-  return out;
+  const {
+    warnings,
+    output,
+  } = Assembler.assemble(ast, source, specifier, getSource);
+  return {
+    output,
+    messages: warnings.map((w) => ({
+      level: 'warn',
+      ...w,
+    })),
+  };
 }
 
 module.exports = {
@@ -31,14 +40,18 @@ if (require.main === module) {
   };
 
   if (process.argv[2]) {
-    const out = translate(getSource('.', process.argv[2]).source, process.argv[2], getSource);
-    process.stdout.write(out);
+    const { output, messages } = translate(getSource('.', process.argv[2]).source, process.argv[2], getSource);
+    messages.forEach((m) => {
+      process.stderr.write(`${m.level}: ${m.message}\n${m.detail}\n`);
+    });
+    process.stdout.write(output);
   } else {
     repl.start({
       prompt: '> ',
       eval(source, c, f, cb) {
         try {
-          cb(null, translate(source, '(repl)', getSource));
+          const { output, messages } = translate(source, '(repl)', getSource);
+          cb(null, `${messages.map((m) => `${m.level}: ${m.message}\n${m.detail}`).join('\n')}\n${output}`.trimStart());
         } catch (e) {
           cb(e, null);
         }

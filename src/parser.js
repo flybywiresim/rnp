@@ -5,7 +5,7 @@ const {
   Token,
   TokenPrecedence,
 } = require('./lexer');
-const createError = require('./util');
+const { createError } = require('./util');
 
 class Parser extends Lexer {
   constructor(source, specifier) {
@@ -235,7 +235,7 @@ class Parser extends Lexer {
     if (this.eat(Token.ASSIGN)) {
       node.right = this.parseExpression();
     } else {
-      const binop = this.startNode();
+      const binop = this.startNode(left);
       binop.left = left;
       binop.operator = this.next().value.slice(0, -1);
       binop.right = this.parseExpression();
