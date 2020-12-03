@@ -108,12 +108,14 @@ class Assembler {
   }
 
   line() {
-    this.lines.push('  '.repeat(this.indent) + this.output.join(' '));
+    if (this.output.length > 0) {
+      this.lines.push('  '.repeat(this.indent) + this.output.join(' '));
+    }
     this.output = [];
   }
 
   getOutput() {
-    return this.lines.join('\n').trim();
+    return this.lines.join('\n');
   }
 
   pushScope() {
