@@ -71,11 +71,14 @@ class Assembler {
     this.specifier = specifier;
     this.getSource = getSource;
     this.warnings = [];
-    this.output = [];
     this.stack = [];
     this.scopes = [];
     this.registerIndex = 0;
     this.exports = new Map();
+
+    this.indent = 0;
+    this.lines = [];
+    this.output = [];
   }
 
   static assemble(ast, ...args) {
@@ -104,8 +107,13 @@ class Assembler {
     this.output.push(s);
   }
 
+  line() {
+    this.lines.push('  '.repeat(this.indent) + this.output.join(' '));
+    this.output = [];
+  }
+
   getOutput() {
-    return this.output.join(' ');
+    return this.lines.join('\n').trim();
   }
 
   pushScope() {
@@ -164,6 +172,7 @@ class Assembler {
           this.emit('p');
         }
       }
+      this.line();
     });
   }
 
@@ -431,9 +440,16 @@ class Assembler {
       this.raise(TypeError, `Expected ${Type.BOOLEAN} but got ${t}`, node.test);
     }
 
-    const visitBranch = (n) => {
+    const visitBranch = (open, n) => {
       const len = this.stack.length;
+
+      this.emit(open);
+      this.line();
+      this.indent += 1;
       this.visit(n);
+      this.indent -= 1;
+      this.emit('}');
+
       /* istanbul ignore next */
       if (this.stack.length - len < 0) {
         throw new RangeError('values popped');
@@ -444,17 +460,13 @@ class Assembler {
       return Type.VOID;
     };
 
-    this.emit('if{');
-    const t0 = visitBranch(node.consequent);
-    this.emit('}');
+    const t0 = visitBranch('if{', node.consequent);
     if (t0 !== Type.VOID && !node.alternative) {
       this.raise(SyntaxError, 'If expression with consequent value must have alternative', node);
     }
 
     if (node.alternative) {
-      this.emit('els{');
-      const t1 = visitBranch(node.alternative);
-      this.emit('}');
+      const t1 = visitBranch('els{', node.alternative);
       if (t0 !== t1) {
         this.raise(TypeError, `consequent returns ${t0} but alternative returns ${t1}`, node);
       }

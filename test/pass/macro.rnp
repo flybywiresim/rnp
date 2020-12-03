@@ -6,4 +6,6 @@ macro x($a, $b) {
 
 x(2, 3);
 ---
-2 sp0 3 sp1 l0 l0 * l1 l1 * + p
+2 sp0
+3 sp1
+l0 l0 * l1 l1 * + p

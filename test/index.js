@@ -31,10 +31,7 @@ for (const filename of readdir(path.join(__dirname, 'pass'))) {
     const [source, expectedRaw] = fs.readFileSync(filename, 'utf8').split('---');
     // for the moment rnp emits a single line of code, so don't worry about newlines and such
     const { output: actual } = translate(source, test, getSource);
-    const expected = expectedRaw
-      .trim()
-      .replace(/\s*\n\s*/g, ' ');
-    t.equal(actual, expected);
+    t.equal(actual, expectedRaw.trim());
     t.end();
   });
 }

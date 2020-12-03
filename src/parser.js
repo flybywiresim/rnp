@@ -436,7 +436,13 @@ class Parser extends Lexer {
     node.test = this.parseExpression();
     node.consequent = this.parseBlock();
     if (this.eat(Token.ELSE)) {
-      node.alternative = this.test(Token.IF) ? this.parseIf() : this.parseBlock();
+      node.alternative = this.test(Token.IF)
+        ? { // wrap in block for assembler formatting
+          type: 'Block',
+          statement: false,
+          statements: [this.parseIf()],
+        }
+        : this.parseBlock();
     } else {
       node.alternative = null;
     }
