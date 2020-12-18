@@ -1,0 +1,15 @@
+macro x($a) {
+  let a = 1;
+  $a;
+  a;
+}
+
+{
+  let a = 2;
+  x(a);
+}
+---
+2 sp0
+1 sp1
+l0 p
+l1 p
