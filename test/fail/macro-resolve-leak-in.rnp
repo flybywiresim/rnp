@@ -1,0 +1,15 @@
+macro foo() {
+  bar
+}
+
+{
+  let bar = 1;
+  foo();
+}
+---
+ReferenceError: bar is not declared
+ --> fail/macro-resolve-leak-in.rnp:2:3
+  |
+2 |   bar
+  |   ^^^ bar is not declared
+  |

@@ -72,7 +72,7 @@ class Assembler {
     this.getSource = getSource;
     this.warnings = [];
     this.stack = [];
-    this.scopes = [];
+    this.scope = null;
     this.registerIndex = 0;
     this.exports = new Map();
 
@@ -118,17 +118,6 @@ class Assembler {
     return this.lines.join('\n');
   }
 
-  pushScope() {
-    const scope = new Map();
-    scope.startIndex = this.registerIndex;
-    this.scopes.push(scope);
-  }
-
-  popScope() {
-    const scope = this.scopes.pop();
-    this.registerIndex = scope.startIndex;
-  }
-
   push(t) {
     /* istanbul ignore next */
     if (t === Type.VOID) {
@@ -141,20 +130,33 @@ class Assembler {
     return this.stack.pop() || Type.VOID;
   }
 
+  pushScope() {
+    const scope = {
+      locals: new Map(),
+      startIndex: this.registerIndex,
+      outer: this.scope,
+    };
+    this.scope = scope;
+  }
+
+  popScope() {
+    const { scope } = this;
+    this.scope = scope.outer;
+    this.registerIndex = scope.startIndex;
+  }
+
   declare(name, data) {
-    for (const scope of this.scopes) {
-      if (scope.has(name)) {
-        return false;
-      }
+    if (this.resolve(name) !== null) {
+      return false;
     }
-    this.scopes[this.scopes.length - 1].set(name, data);
+    this.scope.locals.set(name, data);
     return true;
   }
 
   resolve(name) {
-    for (const scope of this.scopes) {
-      if (scope.has(name)) {
-        return scope.get(name);
+    for (let s = this.scope; s !== null; s = s.outer) {
+      if (s.locals.has(name)) {
+        return s.locals.get(name);
       }
     }
     return null;
@@ -217,43 +219,50 @@ class Assembler {
   }
 
   visitMacroDeclaration(node) {
-    if (!this.declare(node.name.value, node)) {
+    if (!this.declare(node.name.value, { node, scope: this.scope })) {
       this.raise(SyntaxError, `Cannot shadow or redeclare ${node.name.value}`, node.name);
     }
     if (node.isExported) {
-      this.exports.set(node.name.value, node);
+      this.exports.set(node.name.value, { node, scope: null });
     }
   }
 
   visitMacroExpansion(node) {
+    const calleeScope = this.scope;
+
     const macro = this.resolve(node.name.value);
     if (macro === null) {
       this.raise(ReferenceError, `${node.name.value} is not declared`, node.name);
     }
-    if (node.arguments.length !== macro.parameters.length) {
-      this.raise(SyntaxError, `Expected ${macro.parameters.length} arguments`, node.arguments);
+    if (node.arguments.length !== macro.node.parameters.length) {
+      this.raise(SyntaxError, `Expected ${macro.node.parameters.length} arguments`, node.arguments);
     }
+
+    const savedScope = this.scope;
+    this.scope = macro.scope;
     this.pushScope();
-    macro.parameters.forEach((p, i) => {
+
+    macro.node.parameters.forEach((p, i) => {
       const a = node.arguments[i];
-      if (!this.declare(p.value, a)) {
+      if (!this.declare(p.value, { node: a, scope: calleeScope })) {
         this.raise(SyntaxError, `Cannot shadow or redeclare ${p.value}`, p);
       }
     });
-    this.visit(macro.body);
+    this.visit(macro.node.body);
+
     this.popScope();
+    this.scope = savedScope;
   }
 
   visitMacroIdentifier(node) {
-    const ast = this.resolve(node.value);
-    if (ast === null) {
+    const i = this.resolve(node.value);
+    if (i === null) {
       this.raise(ReferenceError, `${node.value} is not declared`, node);
     }
-    // remove scopes so code can't access macro variables
-    const { scopes } = this;
-    this.scopes = [];
-    this.visit(ast);
-    this.scopes = scopes;
+    const savedScope = this.scope;
+    this.scope = i.scope;
+    this.visit(i.node);
+    this.scope = savedScope;
   }
 
   visitAssignment(node) {

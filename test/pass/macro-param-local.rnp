@@ -1,0 +1,12 @@
+macro foo($a) {
+  $a * 2
+}
+
+{
+  let bar = 1;
+  foo(bar);
+}
+---
+1 sp0
+l0 2 *
+p

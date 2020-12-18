@@ -1,0 +1,15 @@
+macro foo($a) {
+  let bar = 1;
+  $a
+}
+
+foo({
+  bar
+});
+---
+ReferenceError: bar is not declared
+ --> fail/macro-resolve-leak-out.rnp:7:3
+  |
+7 |   bar
+  |   ^^^ bar is not declared
+  |
