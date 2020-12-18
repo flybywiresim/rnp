@@ -62,7 +62,9 @@ let a = 1;
 
 #### Macros
 
-Declare a macro. Macros may be exported and used in other files using `import`.
+Declare a macro. Macros may be exported using `export`. Macros are "hygienic",
+meaning that identifiers may not be implicitly leaked into or out of a macro
+scope. Macros parameters use `$` to avoid being confused with normal variables.
 
 ```rnp
 macro add($a, $b) {
@@ -72,8 +74,18 @@ macro add($a, $b) {
 
 ```rnp
 export macro sub($a, $b) {
-  $a + $b
+  $a - $b
 }
+```
+
+```rnp
+macro assign($a) {
+  $a = 1;
+}
+
+let b = 0;
+# does not break hygiene rules because `b` was explicitly passed
+assign(b);
 ```
 
 #### Imports
@@ -174,6 +186,10 @@ if x {
 } else if y {
 } else {
 }
+```
+
+```rnp
+let a = if x { 1 } else { 2 };
 ```
 
 #### Binary and Unary Operators
