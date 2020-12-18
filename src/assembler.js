@@ -3,32 +3,7 @@
 const { OperatorOverload } = require('./lexer');
 const { Parser } = require('./parser');
 const { createError, createMessage } = require('./util');
-
-class Type {
-  constructor(name) {
-    this.name = name.toLowerCase();
-  }
-
-  toString() {
-    return this.name;
-  }
-}
-
-[
-  'ANY',
-  'BOOLEAN',
-  'NUMBER',
-  'STRING',
-  'VOID',
-].forEach((t) => {
-  Type[t] = new Type(t);
-});
-
-const SimVarTypes = {
-  boolean: Type.BOOLEAN,
-  number: Type.NUMBER,
-  string: Type.STRING,
-};
+const { Type, SimVarTypes } = require('./type');
 
 const OpTypes = {
   '+': [Type.NUMBER, Type.NUMBER],
