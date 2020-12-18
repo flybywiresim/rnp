@@ -22,6 +22,7 @@ class Type {
 
 // https://www.prepar3d.com/SDKv5/sdk/references/variables/units_of_measurement.html
 const SimVarTypes = {
+  bool: Type.BOOLEAN,
   boolean: Type.BOOLEAN,
   number: Type.NUMBER,
   string: Type.STRING,
