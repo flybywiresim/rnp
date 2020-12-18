@@ -13,8 +13,8 @@ const LexTree = {};
 
 const MaybeAssignTokens = [
   // Logical
-  ['OR', '||', 4],
-  ['AND', '&&', 5],
+  ['OR', 'or', 4],
+  ['AND', 'and', 5],
 
   // Binop
   ['BIT_OR', '|', 6],

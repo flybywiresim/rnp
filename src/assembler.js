@@ -27,8 +27,8 @@ const OpTypes = {
   '>>': [Type.NUMBER, Type.NUMBER],
   '<<': [Type.NUMBER, Type.NUMBER],
   '!': [Type.BOOLEAN, Type.BOOLEAN],
-  '&&': [Type.BOOLEAN, Type.BOOLEAN],
-  '||': [Type.BOOLEAN, Type.BOOLEAN],
+  'and': [Type.BOOLEAN, Type.BOOLEAN],
+  'or': [Type.BOOLEAN, Type.BOOLEAN],
 };
 
 const formatSimVar = (s) => {
