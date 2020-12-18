@@ -33,7 +33,7 @@ const OpTypes = {
 
 const formatSimVar = (s) => {
   if (s.type) {
-    return `${s.name},${s.type}`;
+    return `${s.name}, ${s.type}`;
   }
   return `${s.name}`;
 };

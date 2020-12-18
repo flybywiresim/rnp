@@ -2,4 +2,4 @@
 (L:ABC, number) += 1;
 ---
 1 (>L:ABC)
-(L:ABC,number) 1 + (>L:ABC,number)
+(L:ABC, number) 1 + (>L:ABC, number)
