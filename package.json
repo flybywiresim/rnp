@@ -1,5 +1,5 @@
 {
-  "name": "rnp",
+  "name": "@flybywiresim/rnp",
   "main": "src/index.js",
   "description": "RNP is a language which compiles to [RPN][], a scripting language used by MSFS.",
   "version": "1.0.0",
