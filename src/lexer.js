@@ -259,6 +259,13 @@ class Lexer {
           return this.scanSimVar();
         }
         return Token.LPAREN;
+      case '-':
+        if (/\d/.test(this.source[this.position + 1])) {
+          return this.scanNumber();
+        }
+        this.position += 1;
+        this.scannedValue = TokenValues[Token.SUB];
+        return Token.SUB;
       default: {
         let match = LexTree[this.source[this.position]];
         const start = this.position;
@@ -291,6 +298,9 @@ class Lexer {
 
   scanNumber() {
     const start = this.position;
+    if (this.source[this.position] === '-') {
+      this.position += 1;
+    }
     let base = 10;
     if (this.source[this.position] === '0') {
       this.position += 1;

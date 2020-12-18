@@ -38,7 +38,7 @@ if (M:Event, string) == 'Leave' {
     (L:RudderTrimtabPos,number) 2 + (>L:RudderTrimtabPos)
     (L:LastPos) (>M:X)
   }
-  (M:X,number) (L:LastPos,number) - 5 - < if{
+  (M:X,number) (L:LastPos,number) - -5 < if{
     (L:RudderTrimtabPos,number) 2 - (>L:RudderTrimtabPos)
     (L:LastPos) (>M:X)
   }
