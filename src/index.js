@@ -25,8 +25,6 @@ module.exports = {
 /* istanbul ignore next */
 if (require.main === module) {
   /* eslint-disable global-require */
-  const util = require('util');
-  const repl = require('repl');
   const fs = require('fs');
   const path = require('path');
 
@@ -46,6 +44,9 @@ if (require.main === module) {
     });
     process.stdout.write(output);
   } else {
+    const repl = require('repl');
+    const util = require('util');
+
     repl.start({
       prompt: '> ',
       eval(source, c, f, cb) {
