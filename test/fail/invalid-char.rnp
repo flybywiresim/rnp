@@ -1,7 +1,6 @@
 # strings can only use single quotes
 let a = "owo";
 ---
-SyntaxError: Unexpected token
  --> fail/invalid-char.rnp:2:9
   |
 2 | let a = "owo";

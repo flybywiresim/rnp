@@ -4,7 +4,6 @@
   3,
 );
 ---
-TypeError: Expected 0 arguments
  --> fail/stdop-arity.rnp:1:8
   |
 1 |   1.floor(

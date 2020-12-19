@@ -1,5 +1,4 @@
 'hello---
-SyntaxError: Unterminated string
  --> fail/unterminated-string.rnp:1:7
   |
 1 | 'hello

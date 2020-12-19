@@ -51,7 +51,6 @@ let v48 = 1;
 let v49 = 1;
 let v50 = 1;
 ---
-RangeError: ran out of registers!!
   --> fail/reg-max.rnp:52:5
    |
 52 | let v50 = 1;

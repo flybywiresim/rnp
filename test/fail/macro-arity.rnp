@@ -3,7 +3,6 @@ macro add($a, $b) {
 
 let z = add(1);
 ---
-SyntaxError: Expected 2 arguments
  --> fail/macro-arity.rnp:4:12
   |
 4 | let z = add(1);

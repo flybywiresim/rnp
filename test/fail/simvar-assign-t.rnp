@@ -1,6 +1,5 @@
 (X:Y, boolean) = 1;
 ---
-TypeError: Expected boolean but got number
  --> fail/simvar-assign-t.rnp:1:18
   |
 1 | (X:Y, boolean) = 1;

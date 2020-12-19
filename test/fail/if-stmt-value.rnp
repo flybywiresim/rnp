@@ -4,7 +4,6 @@ if true {
   2
 }
 ---
-TypeError: Expected void but got number
  --> fail/if-stmt-value.rnp:1:1
   |
 1 | / if true {

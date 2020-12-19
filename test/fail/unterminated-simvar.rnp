@@ -1,6 +1,5 @@
 (X:Y
 ---
-SyntaxError: Unexpected end of simvar
  --> fail/unterminated-simvar.rnp:1:5
   |
 1 | (X:Y

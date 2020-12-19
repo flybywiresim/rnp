@@ -1,7 +1,6 @@
 let x = 1;
 alias x = (L:X, bool);
 ---
-SyntaxError: Cannot shadow or redeclare x
  --> fail/alias-shadow.rnp:2:7
   |
 2 | alias x = (L:X, bool);

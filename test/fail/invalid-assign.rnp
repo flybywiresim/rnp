@@ -1,6 +1,5 @@
 let a 1;
 ---
-SyntaxError: Unexpected token
  --> fail/invalid-assign.rnp:1:7
   |
 1 | let a 1;

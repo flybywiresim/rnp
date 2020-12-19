@@ -40,12 +40,8 @@ for (const filename of readdir(path.join(__dirname, 'fail'))) {
   const test = path.relative(__dirname, filename);
   tap.test(test, (t) => { // eslint-disable-line no-loop-func
     const [source, expected] = fs.readFileSync(filename, 'utf8').split('---\n');
-    try {
-      translate(source, test, getSource);
-      t.fail();
-    } catch (e) {
-      t.equal(e.stack.split('    at')[0], expected);
-    }
+    const { messages } = translate(source, test, getSource);
+    t.equal(messages[0].detail, expected.trimEnd());
     t.end();
   });
 }

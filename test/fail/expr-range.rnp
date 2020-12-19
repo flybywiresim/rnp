@@ -1,6 +1,5 @@
 let a = macro;
 ---
-SyntaxError: Unexpected token
  --> fail/expr-range.rnp:1:9
   |
 1 | let a = macro;

@@ -1,6 +1,5 @@
 a = 1;
 ---
-ReferenceError: a is not declared
  --> fail/local-assign-undeclared.rnp:1:1
   |
 1 | a = 1;

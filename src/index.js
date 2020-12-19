@@ -19,6 +19,7 @@ function translate(source, specifier, getSource) {
       })),
     };
   } catch (e) {
+    /* istanbul ignore else */
     if (e && e[kMessage]) {
       return {
         output: '',
@@ -28,6 +29,7 @@ function translate(source, specifier, getSource) {
         }],
       };
     }
+    /* istanbul ignore next */
     throw e;
   }
 }

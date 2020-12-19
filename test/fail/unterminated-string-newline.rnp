@@ -1,6 +1,5 @@
 'hello
 ---
-SyntaxError: Unterminated string
  --> fail/unterminated-string-newline.rnp:1:7
   |
 1 | 'hello

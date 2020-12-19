@@ -1,7 +1,6 @@
 11 + 11
 22 + 22
 ---
-SyntaxError: Expected semicolon after expression
  --> fail/missing-semi.rnp:1:8
   |
 1 | 11 + 11
