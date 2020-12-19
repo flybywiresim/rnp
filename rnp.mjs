@@ -1326,7 +1326,11 @@ class Assembler {
     this.popScope();
     const t0 = this.pop();
     if (t0 !== this.expectedReturnType) {
-      this.raise(TypeError, `Program expected ${this.expectedReturnType} but got ${t0}`, node);
+      this.raise(
+        TypeError,
+        `Program expected ${this.expectedReturnType} but got ${t0}`,
+        node.statements.length > 0 ? node.statements[node.statements.length - 1] : node,
+      );
     }
   }
 
@@ -1713,6 +1717,7 @@ function translate(source, {
 }
 
 module.exports = {
+  Type,
   translate,
 };
 });
