@@ -1,5 +1,7 @@
 'use strict';
 
+const kMessage = Symbol('kMessage');
+
 function createMessage(source, location, specifier, message) {
   if (location.start.line === location.end.line) {
     const offset = location.start.column - 1;
@@ -45,15 +47,20 @@ ${pad} |`;
 }
 
 function createError(T, source, location, specifier, message) {
+  const payload = {
+    message,
+    detail: createMessage(source, location, specifier, message),
+  };
   const e = new T(message);
   const oldPST = Error.prepareStackTrace;
   Error.prepareStackTrace = (error, trace) => `    at ${trace.join('\n    at ')}`;
   e.stack = `\
 ${e.name}: ${e.message}
-${createMessage(source, location, specifier, message)}
+${payload.detail}
 ${e.stack}`;
   Error.prepareStackTrace = oldPST;
+  e[kMessage] = payload;
   return e;
 }
 
-module.exports = { createError, createMessage };
+module.exports = { createError, createMessage, kMessage };

@@ -3,3 +3,5 @@ package-lock.json
 .nyc_output
 .eslintcache
 coverage
+site/rnp.mjs
+site/rnp.mjs.map

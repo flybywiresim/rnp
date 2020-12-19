@@ -1,21 +1,35 @@
 'use strict';
 
+const { kMessage } = require('./util');
 const { Parser } = require('./parser');
 const { Assembler } = require('./assembler');
 
 function translate(source, specifier, getSource) {
-  const ast = Parser.parse(source, specifier);
-  const {
-    warnings,
-    output,
-  } = Assembler.assemble(ast, source, specifier, getSource);
-  return {
-    output,
-    messages: warnings.map((w) => ({
-      level: 'warn',
-      ...w,
-    })),
-  };
+  try {
+    const ast = Parser.parse(source, specifier);
+    const {
+      warnings,
+      output,
+    } = Assembler.assemble(ast, source, specifier, getSource);
+    return {
+      output,
+      messages: warnings.map((w) => ({
+        level: 'warn',
+        ...w,
+      })),
+    };
+  } catch (e) {
+    if (e && e[kMessage]) {
+      return {
+        output: '',
+        messages: [{
+          level: 'error',
+          ...e[kMessage],
+        }],
+      };
+    }
+    throw e;
+  }
 }
 
 module.exports = {
@@ -50,12 +64,8 @@ if (require.main === module) {
     repl.start({
       prompt: '> ',
       eval(source, c, f, cb) {
-        try {
-          const { output, messages } = translate(source, '(repl)', getSource);
-          cb(null, `${messages.map((m) => `${m.level}: ${m.message}\n${m.detail}`).join('\n')}\n${output}`.trimStart());
-        } catch (e) {
-          cb(e, null);
-        }
+        const { output, messages } = translate(source, '(repl)', getSource);
+        cb(null, `${messages.map((m) => `${m.level}: ${m.message}\n${m.detail}`).join('\n')}\n${output}`.trimStart());
       },
       writer: (v) => (typeof v === 'string' ? v : util.inspect(v)),
     });

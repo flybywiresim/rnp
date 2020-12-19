@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint --cache src test .eslintrc.js",
     "test": "tap --100",
-    "coverage": "tap --coverage-report=html"
+    "coverage": "tap --coverage-report=html",
+    "build:site": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -21,9 +22,14 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/eslint-parser": "^7.12.1",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
+    "@rollup/plugin-replace": "^2.3.4",
+    "@rollup/plugin-virtual": "^2.0.3",
     "eslint": "^7.2.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
+    "rollup": "^2.35.1",
     "tap": "^14.11.0"
   }
 }

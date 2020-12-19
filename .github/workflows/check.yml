@@ -20,3 +20,9 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm run test
+      - uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: site
+          CLEAN: true
