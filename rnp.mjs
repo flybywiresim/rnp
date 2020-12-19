@@ -97,6 +97,9 @@ var util = { createError, createMessage, kMessage };
 const IDENT_START_RE = /\p{ID_Start}/u;
 const IDENT_CONTINUE_RE = /\p{ID_Continue}/u;
 
+const isIDStart = (c) => c && IDENT_START_RE.test(c);
+const isIDContinue = (c) => c && IDENT_CONTINUE_RE.test(c);
+
 const Token = {};
 const TokenNames = {};
 const TokenValues = {};
@@ -376,9 +379,9 @@ class Lexer {
           }
           this.position = start;
         }
-        if (IDENT_START_RE.test(this.source[this.position]) || this.source[this.position] === '$') {
+        if (isIDStart(this.source[this.position]) || this.source[this.position] === '$') {
           this.position += 1;
-          while (IDENT_CONTINUE_RE.test(this.source[this.position])) {
+          while (isIDContinue(this.source[this.position])) {
             this.position += 1;
           }
           this.scannedValue = this.source.slice(start, this.position);
