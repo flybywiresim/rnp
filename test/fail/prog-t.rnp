@@ -1,0 +1,8 @@
+1
+---
+ --> fail/prog-t.rnp:1:1
+  |
+1 | / 1
+2 | | 
+  | |_^ Program expected void but got number
+  |

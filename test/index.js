@@ -30,7 +30,10 @@ for (const filename of readdir(path.join(__dirname, 'pass'))) {
   tap.test(test, (t) => { // eslint-disable-line no-loop-func
     const [source, expectedRaw] = fs.readFileSync(filename, 'utf8').split('---');
     // for the moment rnp emits a single line of code, so don't worry about newlines and such
-    const { output: actual } = translate(source, test, getSource);
+    const { output: actual } = translate(source, {
+      specifier: test,
+      getSource,
+    });
     t.equal(actual, expectedRaw.trim());
     t.end();
   });
@@ -40,8 +43,18 @@ for (const filename of readdir(path.join(__dirname, 'fail'))) {
   const test = path.relative(__dirname, filename);
   tap.test(test, (t) => { // eslint-disable-line no-loop-func
     const [source, expected] = fs.readFileSync(filename, 'utf8').split('---\n');
-    const { messages } = translate(source, test, getSource);
+    const rawFlags = /# Flags: (.+)/.exec(source);
+    const flags = rawFlags ? rawFlags[1].split(' ') : [];
+    const { messages } = translate(source, {
+      specifier: test,
+      getSource: flags.includes('no-get-source') ? undefined : getSource,
+    });
     t.equal(messages[0].detail, expected.trimEnd());
     t.end();
   });
 }
+
+tap.test('random translate stuff', (t) => {
+  translate('');
+  t.end();
+});

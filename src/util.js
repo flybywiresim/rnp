@@ -33,7 +33,7 @@ ${pad} |`;
         return `${start}  ${line}\n${pad} | --${'-'.repeat(location.start.column - 1)}^`;
       }
       if (index === lines.length - 1) {
-        return `${start}| ${line}\n${pad} | |_${'_'.repeat(location.end.column - 2)}^ ${message}`;
+        return `${start}| ${line}\n${pad} | |_${'_'.repeat(Math.max(location.end.column - 2, 0))}^ ${message}`;
       }
       return `${start}| ${line}`;
     })

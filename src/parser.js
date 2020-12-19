@@ -159,7 +159,7 @@ class Parser extends Lexer {
         if (this.eat(Token.SEMICOLON)) {
           return expr;
         }
-        if (end === Token.EOS || !this.test(end)) {
+        if (!this.test(end)) {
           // custom line/column for exact positioning of caret
           this.raise('Expected semicolon after expression', {
             line: expr.location.end.line,

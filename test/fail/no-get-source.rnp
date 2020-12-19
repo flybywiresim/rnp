@@ -1,0 +1,8 @@
+# Flags: no-get-source
+import {} from 'x';
+---
+ --> fail/no-get-source.rnp:2:16
+  |
+2 | import {} from 'x';
+  |                ^^^ Could not resolve 'x' from 'fail/no-get-source.rnp'
+  |

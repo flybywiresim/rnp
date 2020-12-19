@@ -41,8 +41,9 @@ const formatSimVar = (s) => {
 const REGISTER_MAX = 50;
 
 class Assembler {
-  constructor(source, specifier, getSource) {
+  constructor(expectedReturnType, source, specifier, getSource) {
     this.source = source;
+    this.expectedReturnType = expectedReturnType;
     this.specifier = specifier;
     this.getSource = getSource;
     this.warnings = [];
@@ -59,10 +60,6 @@ class Assembler {
   static assemble(ast, ...args) {
     const a = new Assembler(...args);
     a.visit(ast);
-    /* istanbul ignore next */
-    if (a.pop() !== Type.VOID) {
-      throw new RangeError('invalid stack state');
-    }
     return {
       warnings: a.warnings,
       output: a.getOutput(),
@@ -159,12 +156,18 @@ class Assembler {
     this.pushScope();
     this.visitStatementList(node.statements);
     this.popScope();
+    const t0 = this.pop();
+    if (t0 !== this.expectedReturnType) {
+      this.raise(TypeError, `Program expected ${this.expectedReturnType} but got ${t0}`, node);
+    }
   }
 
   visitImportDeclaration(node) {
-    const { source, specifier } = this.getSource(this.specifier, node.specifier.value);
+    const { source, specifier } = this.getSource
+      ? this.getSource(this.specifier, node.specifier.value)
+      : this.raise(Error, `Could not resolve '${node.specifier.value}' from '${this.specifier}'`, node.specifier);
     const ast = Parser.parse(source, specifier);
-    const a = new Assembler(source, specifier, this.getSource);
+    const a = new Assembler(Type.VOID, source, specifier, this.getSource);
     a.visit(ast);
     for (const i of node.imports) {
       if (!a.exports.has(i.value)) {
