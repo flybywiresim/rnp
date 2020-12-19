@@ -267,13 +267,6 @@ class Lexer {
           return this.scanSimVar();
         }
         return Token.LPAREN;
-      case '-':
-        if (/\d/.test(this.source[this.position + 1])) {
-          return this.scanNumber();
-        }
-        this.position += 1;
-        this.scannedValue = TokenValues[Token.SUB];
-        return Token.SUB;
       default: {
         const start = this.position;
         if (isIDStart(this.source[this.position]) || this.source[this.position] === '$') {
@@ -288,6 +281,10 @@ class Lexer {
           return this.scannedValue.startsWith('$')
             ? Token.MACRO_IDENTIFIER
             : Token.IDENTIFIER;
+        }
+        if (this.source[this.position] === '-'
+            && /\d/.test(this.source[this.position + 1])) {
+          return this.scanNumber();
         }
         let match = LexTree[this.source[this.position]];
         if (match) {
