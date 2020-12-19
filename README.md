@@ -5,6 +5,32 @@ RNP is a language which compiles to [RPN][], a scripting language used by MSFS.
 RNP provides a familiar and expressive environment with strict types. In
 the future it may also perform optimization.
 
+## API
+
+```js
+const { Type, translate } = require('@flybywiresim/rnp');
+
+// function to resolve imports
+function getSource(
+  referrer,  // specifier of importing module
+  specifier, // specifier of module to be imported
+) {
+  return {
+    source,    // source of imported module
+    specifier, // resolved specifier, e.g. `dirname(referrer).join(specifier)`
+  };
+}
+
+const {
+  output,    // string RPN output
+  messages,  // [{ level, message, location }]
+} = translate(source, {
+  specifier,   // defaults to '(anonymous)'
+  returnType,  // defaults to `Type.VOID`
+  getSource,   // defaults to compile-time error
+});
+```
+
 ## Types
 
 - `boolean` - `true` or `false`.
