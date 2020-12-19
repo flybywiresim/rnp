@@ -19,7 +19,7 @@ function translate(source, {
     return {
       output,
       messages: warnings.map((w) => ({
-        level: 'warn',
+        level: 'warning',
         ...w,
       })),
     };

@@ -72,7 +72,7 @@ class Assembler {
 
   warn(message, context) {
     const detail = createMessage(this.source, context.location, this.specifier, message);
-    this.warnings.push({ detail, message });
+    this.warnings.push({ detail, message, location: context.location });
   }
 
   emit(s) {

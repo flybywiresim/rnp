@@ -49,6 +49,7 @@ ${pad} |`;
 function createError(T, source, location, specifier, message) {
   const payload = {
     message,
+    location,
     detail: createMessage(source, location, specifier, message),
   };
   const e = new T(message);
