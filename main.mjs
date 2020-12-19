@@ -1,7 +1,7 @@
 /* global CodeMirror */
 /* eslint-env browser */
 
-import rnp from './rnp.mjs';
+import rnp from './rnp.mjs?t=1';
 
 const output = document.querySelector('#output');
 const errors = document.querySelector('#errors');
