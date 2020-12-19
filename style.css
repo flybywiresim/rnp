@@ -1,0 +1,109 @@
+html, body {
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2 {
+  margin: 0;
+}
+
+label {
+  white-space: nowrap;
+  margin-right: 1ex;
+  margin-bottom: 5px;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 5px;
+}
+
+legend {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+body {
+  font-family: sans-serif;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+textarea {
+  font-family: monospace;
+  display: block;
+  flex-grow: 1;
+  border: 1px solid black;
+}
+
+.CodeMirror {
+  flex-grow: 1;
+  border: 1px solid black;
+}
+
+textarea:disabled {
+  border: 1px solid black;
+  color: black;
+}
+
+#input-section, #output-section {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+#output {
+  flex-grow: 1;
+  min-height: 200px;
+  background-color: white;
+  border: 1px solid black;
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+#errors {
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+#output > div {
+  padding-left: 0.3em;
+}
+
+#github {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 149px;
+  height: 149px;
+  background-image: url('./github_ribbon.png');
+}
+
+@media (min-width: 800px) {
+  html, body {
+    height: 100%;
+  }
+  main {
+    flex-direction: row;
+  }
+  main > *:not(:first-child) {
+    margin-left: 10px;
+  }
+  #features {
+    flex-wrap: wrap;
+  }
+}
