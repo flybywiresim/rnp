@@ -78,6 +78,7 @@ ${pad} |`;
 function createError(T, source, location, specifier, message) {
   const payload = {
     message,
+    location,
     detail: createMessage(source, location, specifier, message),
   };
   const e = new T(message);
@@ -1235,7 +1236,7 @@ class Assembler {
 
   warn(message, context) {
     const detail = createMessage$1(this.source, context.location, this.specifier, message);
-    this.warnings.push({ detail, message });
+    this.warnings.push({ detail, message, location: context.location });
   }
 
   emit(s) {
@@ -1685,7 +1686,7 @@ function translate(source, {
     return {
       output,
       messages: warnings.map((w) => ({
-        level: 'warn',
+        level: 'warning',
         ...w,
       })),
     };
