@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const tap = require('tap');
-const { translate } = require('..');
+const { translate, Type } = require('..');
 
 function* readdir(d) {
   for (const dirent of fs.readdirSync(d, { withFileTypes: true })) {
@@ -44,10 +44,23 @@ for (const filename of readdir(path.join(__dirname, 'fail'))) {
   tap.test(test, (t) => { // eslint-disable-line no-loop-func
     const [source, expected] = fs.readFileSync(filename, 'utf8').split('---\n');
     const rawFlags = /# Flags: (.+)/.exec(source);
-    const flags = rawFlags ? rawFlags[1].split(' ') : [];
+    const flags = {};
+    if (rawFlags) {
+      rawFlags[1]
+        .split(' ')
+        .forEach((f) => {
+          if (f.includes('=')) {
+            const [k, v] = f.split('=');
+            flags[k] = v;
+          } else {
+            flags[f] = true;
+          }
+        });
+    }
     const { messages } = translate(source, {
       specifier: test,
-      getSource: flags.includes('no-get-source') ? undefined : getSource,
+      getSource: flags['no-get-source'] ? undefined : getSource,
+      returnType: flags['return-type'] ? Type[flags['return-type']] : undefined,
     });
     t.equal(messages[0].detail, expected.trimEnd());
     t.end();

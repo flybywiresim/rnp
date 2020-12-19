@@ -40,6 +40,7 @@ function translate(source, {
 }
 
 module.exports = {
+  Type,
   translate,
 };
 
