@@ -11,6 +11,7 @@ const TokenNames = {};
 const TokenValues = {};
 const TokenPrecedence = {};
 const OperatorOverload = {};
+const Keywords = Object.create(null);
 
 const LexTree = {};
 
@@ -87,6 +88,9 @@ const MaybeAssignTokens = [
   TokenValues[i] = v;
   TokenPrecedence[name] = prec || 0;
   TokenPrecedence[i] = TokenPrecedence[name];
+  if (name.toLowerCase() === v) {
+    Keywords[v] = i;
+  }
 
   if (overload) {
     OperatorOverload[v] = overload;
@@ -271,29 +275,29 @@ class Lexer {
         this.scannedValue = TokenValues[Token.SUB];
         return Token.SUB;
       default: {
-        let match = LexTree[this.source[this.position]];
         const start = this.position;
-        if (match) {
-          this.position += 1;
-          while (match[this.source[this.position]]) {
-            match = match[this.source[this.position]];
-            this.position += 1;
-          }
-          if (match.value !== undefined) {
-            this.scannedValue = TokenValues[match.value];
-            return match.value;
-          }
-          this.position = start;
-        }
         if (isIDStart(this.source[this.position]) || this.source[this.position] === '$') {
           this.position += 1;
           while (isIDContinue(this.source[this.position])) {
             this.position += 1;
           }
           this.scannedValue = this.source.slice(start, this.position);
+          if (Keywords[this.scannedValue]) {
+            return Keywords[this.scannedValue];
+          }
           return this.scannedValue.startsWith('$')
             ? Token.MACRO_IDENTIFIER
             : Token.IDENTIFIER;
+        }
+        let match = LexTree[this.source[this.position]];
+        if (match) {
+          this.position += 1;
+          while (match[this.source[this.position]]) {
+            match = match[this.source[this.position]];
+            this.position += 1;
+          }
+          this.scannedValue = TokenValues[match.value];
+          return match.value;
         }
         return this.unexpected(this.position);
       }
