@@ -3,5 +3,4 @@ test
 .eslintignore
 .nyc_output
 coverage
-site/rnp.mjs
-site/rnp.mjs.map
+site
