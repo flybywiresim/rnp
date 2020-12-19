@@ -5,19 +5,22 @@ import rnp from './rnp.mjs';
 
 CodeMirror.defineSimpleMode('rnp', {
   start: [
-    { regex: /\$\p{ID_Continue}*/u, token: 'variable-3' },
+    { regex: /\$\p{ID_Continue}*/u, token: 'variable-2' },
     { regex: /\p{ID_Start}\p{ID_Continue}*/u, token: 'variable' },
     { regex: /'(?:[^\\]|\\.)*?(?:'|$)/, token: 'string' },
     { regex: /(?:if|else|let|alias|macro|import|export|from)\b/, token: 'keyword' },
-    { regex: /(?:true|false)\b|\(.:.+\)/, token: 'atom' },
+    { regex: /(?:true|false)\b|\(.:.+?\)/, token: 'atom' },
     { regex: /-?0x[a-f\d]+|-?0b[01]+|-?(?:\.\d+|\d+\.?\d*)(?:e-?\d+)?/i, token: 'number' },
     { regex: /[-+/*=<>!]+/, token: 'operator' },
     { regex: /{/, indent: true },
     { regex: /}/, dedent: true },
-    { regex: /#\*/, push: 'comment' },
+    { regex: /#\*/, token: 'comment', push: 'comment' },
+    { regex: /#(?!\*).*/, token: 'comment' },
   ],
   comment: [
-    { regex: /\*#/, pop: 'comment' },
+    { regex: /#\*/, token: 'comment', push: 'comment' },
+    { regex: /(.|\n)*?\*#/, token: 'comment', pop: true },
+    { regex: /((?!#\*).|\n)*/, token: 'comment' },
   ],
   meta: {
     dontIndentStates: ['comment'],
@@ -58,3 +61,4 @@ editor.on('change', () => {
   }
   onChangeTimer = setTimeout(translate, 250);
 });
+translate();
