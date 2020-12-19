@@ -15,6 +15,7 @@ function getSource(
   referrer,  // specifier of importing module
   specifier, // specifier of module to be imported
 ) {
+  // return `null` if module can't be resolved.
   return {
     source,    // source of imported module
     specifier, // resolved specifier, e.g. `dirname(referrer).join(specifier)`
@@ -27,7 +28,7 @@ const {
 } = translate(source, {
   specifier,   // defaults to '(anonymous)'
   returnType,  // defaults to `Type.VOID`
-  getSource,   // defaults to compile-time error
+  getSource,   // defaults to resolution error
 });
 ```
 

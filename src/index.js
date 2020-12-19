@@ -52,6 +52,9 @@ if (require.main === module) {
 
   const getSource = (referrer, specifier) => {
     const resolved = path.join(referrer === '(repl)' ? '.' : path.basename(referrer), specifier);
+    if (!fs.existsSync(resolved)) {
+      return null;
+    }
     const source = fs.readFileSync(resolved, 'utf8');
     return {
       source,

@@ -167,9 +167,14 @@ class Assembler {
   }
 
   visitImportDeclaration(node) {
-    const { source, specifier } = this.getSource
-      ? this.getSource(this.specifier, node.specifier.value)
-      : this.raise(Error, `Could not resolve '${node.specifier.value}' from '${this.specifier}'`, node.specifier);
+    let resolved = null;
+    if (this.getSource) {
+      resolved = this.getSource(this.specifier, node.specifier.value);
+    }
+    if (resolved === null) {
+      this.raise(Error, `Could not resolve '${node.specifier.value}' from '${this.specifier}'`, node.specifier);
+    }
+    const { source, specifier } = resolved;
     const ast = Parser.parse(source, specifier);
     const a = new Assembler(Type.VOID, source, specifier, this.getSource);
     a.visit(ast);
