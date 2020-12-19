@@ -10,7 +10,48 @@
     <h1>RNP</h1>
     <main>
       <section id="input-section">
-        <textarea id="input" autocomplete="off"></textarea>
+        <textarea id="input" autocomplete="off">alias event = (M:Event, string);
+alias rudderTrimtabPos = (L:RudderTrimtabPos, number);
+
+if event == 'LeftSingle' {
+  (L:LastPos) = (M:X);
+}
+if event == 'WheelUp' {
+  (K:RUDDER_TRIM_RIGHT) = 0;
+}
+if event == 'WheelDown' {
+  (K:RUDDER_TRIM_LEFT) = 0;
+}
+if event == 'LeftDrag' {
+  if ((M:X, number) - (L:LastPos, number)) > 5 {
+    rudderTrimtabPos += 2;
+    (L:LastPos) = (M:X);
+  }
+  if ((M:X, number) - (L:LastPos, number)) < -5 {
+    rudderTrimtabPos -= 2;
+    (L:LastPos) = (M:X);
+  }
+}
+if event == 'LeftRelease' {
+  (L:RudderTrimtabPos) = 50;
+}
+if event == 'Leave' {
+  (L:RudderTrimtabPos) = 50;
+}
+
+
+macro mapf($n, $inMin, $inMax, $outMin, $outMax) {
+  ($n - $inMin) * ($outMax - $outMin) / ($inMax - $inMin) + $outMin
+}
+
+let throttle = (A:GENERAL ENG THROTTLE LEVER POSITION:#ID#, percent);
+(L:MY_THROTTLE) = if throttle > 0 {
+  mapf(throttle, 0, 100, 25, 100)
+} else {
+  mapf(throttle, -20, 100, 0, 25)
+};
+
+(L:Hello) = 'hello, world'.toUpperCase();</textarea>
       </section>
       <section id="output-section">
         <h2>Output:</h2>
