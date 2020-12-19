@@ -62,7 +62,7 @@ ${pad} |`;
         return `${start}  ${line}\n${pad} | --${'-'.repeat(location.start.column - 1)}^`;
       }
       if (index === lines.length - 1) {
-        return `${start}| ${line}\n${pad} | |_${'_'.repeat(location.end.column - 2)}^ ${message}`;
+        return `${start}| ${line}\n${pad} | |_${'_'.repeat(Math.max(location.end.column - 2, 0))}^ ${message}`;
       }
       return `${start}| ${line}`;
     })
@@ -93,6 +93,171 @@ ${e.stack}`;
 }
 
 var util = { createError, createMessage, kMessage };
+
+class Type {
+  constructor(name) {
+    this.name = name.toLowerCase();
+  }
+
+  toString() {
+    return this.name;
+  }
+}
+
+[
+  'ANY',
+  'BOOLEAN',
+  'NUMBER',
+  'STRING',
+  'VOID',
+].forEach((t) => {
+  Type[t] = new Type(t);
+});
+
+// https://www.prepar3d.com/SDKv5/sdk/references/variables/units_of_measurement.html
+const SimVarTypes = {
+  bool: Type.BOOLEAN,
+  boolean: Type.BOOLEAN,
+  number: Type.NUMBER,
+  string: Type.STRING,
+};
+
+// All the number types
+[
+  // Distance
+  'meters',
+  'centimeters',
+  'kilometers',
+  'millimeters',
+  'miles',
+  'decimiles',
+  'nautical miles',
+  'feet',
+  'inches',
+  'yards',
+  // Area
+  'square inches',
+  'square feet',
+  'square yards',
+  'square meters',
+  'square centimeters',
+  'square kilometers',
+  'square millimeters',
+  'square miles',
+  // Volume
+  'cubic inches',
+  'cubic feet',
+  'cubic yards',
+  'cubic miles',
+  'cubic milimeters',
+  'cubic centimeters',
+  'cubic meters',
+  'cubic kilometers',
+  'liters',
+  'gallons',
+  'quarts',
+  // Temperature
+  'kelvin',
+  'rankine',
+  'fahrenheit',
+  'celsius',
+  // Angle
+  'radians',
+  'rounds',
+  'degrees',
+  'degree latitude',
+  'degree longitude',
+  'grads',
+  // Global Position
+  'degrees latitude',
+  'degrees longitude',
+  'meters latitude',
+  // Angular Velocity
+  'radians per second',
+  'revolutions per minute',
+  'minutes per round',
+  'nice minutes per round',
+  'degrees per second',
+  // Speed
+  'meters per second',
+  'meters per minute',
+  'feet per second',
+  'feet per minute',
+  'kph',
+  'knots',
+  'mph',
+  'machs',
+  // Acceleration
+  'meters per second squared',
+  'g force',
+  'feet per second squared',
+  // Time
+  'seconds',
+  'minutes',
+  'hours',
+  'days',
+  'hours over 10',
+  // Power
+  'watts',
+  'ft lb per second',
+  'horsepower',
+  // Volume Rate
+  'meters cubed per second',
+  'gallons per hour',
+  'liters per hour',
+  // Weight
+  'kilograms',
+  'geepounds',
+  'pounds',
+  // Weight Rate
+  'kilograms per second',
+  'pounds per hour',
+  'pounds per second',
+  // Electrical Current
+  'amps',
+  // Electrical Potential
+  'volts',
+  // Frequency
+  'hz',
+  'khz',
+  'mhz',
+  // Density
+  'kilograms per cubic meter',
+  'slugs per cubic foot',
+  'pounds per gallon',
+  // Pressure
+  'pascals',
+  'newtons per square meter',
+  'kpa',
+  'kilogram force per square centimeter',
+  'mmHg',
+  'cmHg',
+  'inHg',
+  'atm',
+  'psi',
+  'millimeters of water',
+  'bars',
+  // Torque
+  'newton meter',
+  'foot-pounds',
+  // Misc
+  'part',
+  'half',
+  'third',
+  'percent',
+  'percent over 100',
+  'decibels',
+  'position 16k',
+  'position 32k',
+  'enum',
+].forEach((n) => {
+  SimVarTypes[n] = Type.NUMBER;
+});
+
+var type = {
+  Type,
+  SimVarTypes,
+};
 
 const IDENT_START_RE = /\p{ID_Start}/u;
 const IDENT_CONTINUE_RE = /\p{ID_Continue}/u;
@@ -669,7 +834,7 @@ class Parser extends Lexer$1 {
         if (this.eat(Token$1.SEMICOLON)) {
           return expr;
         }
-        if (end === Token$1.EOS || !this.test(end)) {
+        if (!this.test(end)) {
           // custom line/column for exact positioning of caret
           this.raise('Expected semicolon after expression', {
             line: expr.location.end.line,
@@ -998,171 +1163,6 @@ class Parser extends Lexer$1 {
 
 var parser = { Parser };
 
-class Type {
-  constructor(name) {
-    this.name = name.toLowerCase();
-  }
-
-  toString() {
-    return this.name;
-  }
-}
-
-[
-  'ANY',
-  'BOOLEAN',
-  'NUMBER',
-  'STRING',
-  'VOID',
-].forEach((t) => {
-  Type[t] = new Type(t);
-});
-
-// https://www.prepar3d.com/SDKv5/sdk/references/variables/units_of_measurement.html
-const SimVarTypes = {
-  bool: Type.BOOLEAN,
-  boolean: Type.BOOLEAN,
-  number: Type.NUMBER,
-  string: Type.STRING,
-};
-
-// All the number types
-[
-  // Distance
-  'meters',
-  'centimeters',
-  'kilometers',
-  'millimeters',
-  'miles',
-  'decimiles',
-  'nautical miles',
-  'feet',
-  'inches',
-  'yards',
-  // Area
-  'square inches',
-  'square feet',
-  'square yards',
-  'square meters',
-  'square centimeters',
-  'square kilometers',
-  'square millimeters',
-  'square miles',
-  // Volume
-  'cubic inches',
-  'cubic feet',
-  'cubic yards',
-  'cubic miles',
-  'cubic milimeters',
-  'cubic centimeters',
-  'cubic meters',
-  'cubic kilometers',
-  'liters',
-  'gallons',
-  'quarts',
-  // Temperature
-  'kelvin',
-  'rankine',
-  'fahrenheit',
-  'celsius',
-  // Angle
-  'radians',
-  'rounds',
-  'degrees',
-  'degree latitude',
-  'degree longitude',
-  'grads',
-  // Global Position
-  'degrees latitude',
-  'degrees longitude',
-  'meters latitude',
-  // Angular Velocity
-  'radians per second',
-  'revolutions per minute',
-  'minutes per round',
-  'nice minutes per round',
-  'degrees per second',
-  // Speed
-  'meters per second',
-  'meters per minute',
-  'feet per second',
-  'feet per minute',
-  'kph',
-  'knots',
-  'mph',
-  'machs',
-  // Acceleration
-  'meters per second squared',
-  'g force',
-  'feet per second squared',
-  // Time
-  'seconds',
-  'minutes',
-  'hours',
-  'days',
-  'hours over 10',
-  // Power
-  'watts',
-  'ft lb per second',
-  'horsepower',
-  // Volume Rate
-  'meters cubed per second',
-  'gallons per hour',
-  'liters per hour',
-  // Weight
-  'kilograms',
-  'geepounds',
-  'pounds',
-  // Weight Rate
-  'kilograms per second',
-  'pounds per hour',
-  'pounds per second',
-  // Electrical Current
-  'amps',
-  // Electrical Potential
-  'volts',
-  // Frequency
-  'hz',
-  'khz',
-  'mhz',
-  // Density
-  'kilograms per cubic meter',
-  'slugs per cubic foot',
-  'pounds per gallon',
-  // Pressure
-  'pascals',
-  'newtons per square meter',
-  'kpa',
-  'kilogram force per square centimeter',
-  'mmHg',
-  'cmHg',
-  'inHg',
-  'atm',
-  'psi',
-  'millimeters of water',
-  'bars',
-  // Torque
-  'newton meter',
-  'foot-pounds',
-  // Misc
-  'part',
-  'half',
-  'third',
-  'percent',
-  'percent over 100',
-  'decibels',
-  'position 16k',
-  'position 32k',
-  'enum',
-].forEach((n) => {
-  SimVarTypes[n] = Type.NUMBER;
-});
-
-var type = {
-  Type,
-  SimVarTypes,
-};
-
 const { OperatorOverload: OperatorOverload$1 } = lexer;
 const { Parser: Parser$1 } = parser;
 const { createError: createError$2, createMessage: createMessage$1 } = util;
@@ -1204,8 +1204,9 @@ const formatSimVar = (s) => {
 const REGISTER_MAX = 50;
 
 class Assembler {
-  constructor(source, specifier, getSource) {
+  constructor(expectedReturnType, source, specifier, getSource) {
     this.source = source;
+    this.expectedReturnType = expectedReturnType;
     this.specifier = specifier;
     this.getSource = getSource;
     this.warnings = [];
@@ -1222,10 +1223,6 @@ class Assembler {
   static assemble(ast, ...args) {
     const a = new Assembler(...args);
     a.visit(ast);
-    /* istanbul ignore next */
-    if (a.pop() !== Type$1.VOID) {
-      throw new RangeError('invalid stack state');
-    }
     return {
       warnings: a.warnings,
       output: a.getOutput(),
@@ -1322,12 +1319,18 @@ class Assembler {
     this.pushScope();
     this.visitStatementList(node.statements);
     this.popScope();
+    const t0 = this.pop();
+    if (t0 !== this.expectedReturnType) {
+      this.raise(TypeError, `Program expected ${this.expectedReturnType} but got ${t0}`, node);
+    }
   }
 
   visitImportDeclaration(node) {
-    const { source, specifier } = this.getSource(this.specifier, node.specifier.value);
+    const { source, specifier } = this.getSource
+      ? this.getSource(this.specifier, node.specifier.value)
+      : this.raise(Error, `Could not resolve '${node.specifier.value}' from '${this.specifier}'`, node.specifier);
     const ast = Parser$1.parse(source, specifier);
-    const a = new Assembler(source, specifier, this.getSource);
+    const a = new Assembler(Type$1.VOID, source, specifier, this.getSource);
     a.visit(ast);
     for (const i of node.imports) {
       if (!a.exports.has(i.value)) {
@@ -1664,16 +1667,21 @@ var assembler = { Assembler };
 var src = createCommonjsModule(function (module) {
 
 const { kMessage } = util;
+const { Type } = type;
 const { Parser } = parser;
 const { Assembler } = assembler;
 
-function translate(source, specifier, getSource) {
+function translate(source, {
+  specifier = '(anonymous)',
+  returnType = Type.VOID,
+  getSource,
+} = {}) {
   try {
     const ast = Parser.parse(source, specifier);
     const {
       warnings,
       output,
-    } = Assembler.assemble(ast, source, specifier, getSource);
+    } = Assembler.assemble(ast, returnType, source, specifier, getSource);
     return {
       output,
       messages: warnings.map((w) => ({
