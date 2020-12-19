@@ -1,0 +1,8 @@
+alias x = (L:X);
+---
+SyntaxError: Aliased simvars must have a unit
+ --> fail/alias-no-type.rnp:1:11
+  |
+1 | alias x = (L:X);
+  |           ^^^^^ Aliased simvars must have a unit
+  |

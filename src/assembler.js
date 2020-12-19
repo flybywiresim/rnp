@@ -193,6 +193,12 @@ class Assembler {
     this.emit(`sp${register}`);
   }
 
+  visitAliasDeclaration(node) {
+    if (!this.declare(node.name.value, { alias: node.simvar })) {
+      this.raise(SyntaxError, `Cannot shadow or redeclare ${node.name.value}`, node.name);
+    }
+  }
+
   visitMacroDeclaration(node) {
     if (!this.declare(node.name.value, { node, scope: this.scope })) {
       this.raise(SyntaxError, `Cannot shadow or redeclare ${node.name.value}`, node.name);
@@ -257,10 +263,17 @@ class Assembler {
         if (local === null) {
           this.raise(ReferenceError, `${node.left.value} is not declared`, node.left);
         }
-        if (t0 !== local.type) {
-          this.raise(TypeError, `Expected ${local.type} but got ${t0}`, node.right);
+        if (local.alias) {
+          if (t0 !== SimVarTypes[local.alias.value.type]) {
+            this.raise(TypeError, `Expected ${SimVarTypes[local.alias.value.type]} but got ${t0}`, node.right);
+          }
+          this.emit(`(>${formatSimVar(local.alias.value)})`);
+        } else {
+          if (t0 !== local.type) {
+            this.raise(TypeError, `Expected ${local.type} but got ${t0}`, node.right);
+          }
+          this.emit(`sp${local.register}`);
         }
-        this.emit(`sp${local.register}`);
         break;
       }
       /* istanbul ignore next */
@@ -395,8 +408,12 @@ class Assembler {
     if (local === null) {
       this.raise(ReferenceError, `${node.value} is not declared`, node);
     }
-    this.emit(`l${local.register}`);
-    this.push(local.type);
+    if (local.alias) {
+      this.visit(local.alias);
+    } else {
+      this.emit(`l${local.register}`);
+      this.push(local.type);
+    }
   }
 
   visitBooleanLiteral(node) {

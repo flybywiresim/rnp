@@ -55,6 +55,7 @@ const MaybeAssignTokens = [
   ['IF', 'if'],
   ['ELSE', 'else'],
   ['LET', 'let'],
+  ['ALIAS', 'alias'],
   ['MACRO', 'macro'],
   ['TRUE', 'true'],
   ['FALSE', 'false'],

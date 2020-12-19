@@ -42,6 +42,10 @@ class Parser extends Lexer {
         startColumn = startIndex - this.columnOffset + 1;
       }
       endColumn = startColumn + 1;
+    } else if (context.location) {
+      line = context.location.start.line;
+      startColumn = context.location.start.column;
+      endColumn = context.location.end.column;
     } else {
       ({
         line,
@@ -128,6 +132,8 @@ class Parser extends Lexer {
         return this.parseImportDeclaration();
       case Token.LET:
         return this.parseLocalDeclaration();
+      case Token.ALIAS:
+        return this.parseAliasDeclaration();
       case Token.EXPORT:
       case Token.MACRO:
         if (this.insideMacro) {
@@ -197,6 +203,21 @@ class Parser extends Lexer {
     node.value = this.parseExpression();
     this.expect(Token.SEMICOLON);
     return this.finishNode(node, 'LocalDeclaration');
+  }
+
+  // AliasDeclaration :
+  //   `alias` Identifier `=` SimVar `;`
+  parseAliasDeclaration() {
+    const node = this.startNode();
+    this.expect(Token.ALIAS);
+    node.name = this.parseIdentifier();
+    this.expect(Token.ASSIGN);
+    node.simvar = this.parseSimVar();
+    if (!node.simvar.value.type) {
+      this.raise('Aliased simvars must have a unit', node.simvar);
+    }
+    this.expect(Token.SEMICOLON);
+    return this.finishNode(node, 'AliasDeclaration');
   }
 
   // MacroDeclaration :
@@ -356,9 +377,6 @@ class Parser extends Lexer {
   //   `(` Expression `)`
   //   SimVar
   //   If
-  //
-  // SimVar :
-  //   `(` any char `:` any chars `)`
   parsePrimaryExpression() {
     switch (this.peek().type) {
       case Token.IDENTIFIER:
@@ -387,11 +405,8 @@ class Parser extends Lexer {
         this.expect(Token.RPAREN);
         return node;
       }
-      case Token.SIMVAR: {
-        const node = this.startNode();
-        node.value = this.next().value;
-        return this.finishNode(node, 'SimVar');
-      }
+      case Token.SIMVAR:
+        return this.parseSimVar();
       case Token.IF:
         return this.parseIf();
       case Token.LBRACE:
@@ -415,6 +430,14 @@ class Parser extends Lexer {
     const node = this.startNode();
     node.value = this.expect(Token.MACRO_IDENTIFIER).value;
     return this.finishNode(node, 'MacroIdentifier');
+  }
+
+  // SimVar :
+  //   `(` any char `:` any chars `)`
+  parseSimVar() {
+    const node = this.startNode();
+    node.value = this.expect(Token.SIMVAR).value;
+    return this.finishNode(node, 'SimVar');
   }
 
   // StringLiteral :

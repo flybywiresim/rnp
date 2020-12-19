@@ -1,0 +1,9 @@
+alias x = (L:X, bool);
+x = 1;
+---
+TypeError: Expected boolean but got number
+ --> fail/alias-t.rnp:2:5
+  |
+2 | x = 1;
+  |     ^ Expected boolean but got number
+  |

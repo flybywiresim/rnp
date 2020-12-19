@@ -60,6 +60,18 @@ Declare a local.
 let a = 1;
 ```
 
+### Aliases
+
+SimVars can be aliased to local names.
+
+```rnp
+alias x = (L:X, bool);
+
+x = true; # set L:X to true
+if x {    # if L:X is true
+}
+```
+
 #### Macros
 
 Declare a macro. Macros may be exported using `export`. Macros are "hygienic",

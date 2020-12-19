@@ -1,0 +1,6 @@
+alias x = (L:X, bool);
+x = true;
+x;
+---
+1 (>L:X, bool)
+(L:X, bool) p
