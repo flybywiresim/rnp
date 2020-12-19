@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devsnek/rnp.git"
+    "url": "git+https://github.com/flybywiresim/rnp.git"
   },
   "author": "snek",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/devsnek/rnp/issues"
+    "url": "https://github.com/flybywiresim/rnp/issues"
   },
-  "homepage": "https://github.com/devsnek/rnp#readme",
+  "homepage": "https://github.com/flybywiresim/rnp#readme",
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/eslint-parser": "^7.12.1",
