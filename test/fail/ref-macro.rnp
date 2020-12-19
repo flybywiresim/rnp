@@ -1,0 +1,8 @@
+macro x() {}
+x;
+---
+ --> fail/ref-macro.rnp:2:1
+  |
+2 | x;
+  | ^ x is not a local
+  |

@@ -413,9 +413,11 @@ class Assembler {
     }
     if (local.alias) {
       this.visit(local.alias);
-    } else {
+    } else if (local.register !== undefined) {
       this.emit(`l${local.register}`);
       this.push(local.type);
+    } else {
+      this.raise(TypeError, `${node.value} is not a local`, node);
     }
   }
 
