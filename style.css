@@ -4,28 +4,12 @@ html, body {
   overflow: auto;
   display: flex;
   flex-direction: column;
+  background-color: #202020;
+  color: #d6d5d4;
 }
 
 h1, h2 {
   margin: 0;
-}
-
-label {
-  white-space: nowrap;
-  margin-right: 1ex;
-  margin-bottom: 5px;
-}
-
-fieldset {
-  border: none;
-  padding: 0;
-  margin: 0;
-  margin-bottom: 5px;
-}
-
-legend {
-  font-weight: bold;
-  margin-bottom: 5px;
 }
 
 body {
@@ -41,23 +25,6 @@ main {
   flex-grow: 1;
 }
 
-textarea {
-  font-family: monospace;
-  display: block;
-  flex-grow: 1;
-  border: 1px solid black;
-}
-
-.CodeMirror {
-  flex-grow: 1;
-  border: 1px solid black;
-}
-
-textarea:disabled {
-  border: 1px solid black;
-  color: black;
-}
-
 #input-section, #output-section {
   display: flex;
   flex-direction: column;
@@ -65,32 +32,26 @@ textarea:disabled {
   flex-shrink: 1;
 }
 
+.CodeMirror {
+  flex-grow: 1;
+  line-height: 20px;
+  border: 1px solid #343434;
+  border-radius: 6px;
+}
+
 #output {
+  line-height: 20px;
   flex-grow: 1;
   min-height: 200px;
-  background-color: white;
-  border: 1px solid black;
+  border: 1px solid #343434;
+  border-radius: 6px;
   font-family: monospace;
   white-space: pre-wrap;
-}
-
-#errors {
-  font-family: monospace;
-  white-space: pre-wrap;
-}
-
-#output > div {
-  padding-left: 0.3em;
-}
-
-#github {
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 149px;
-  height: 149px;
-  background-image: url('./github_ribbon.png');
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
+  background-color: #141414;
 }
 
 @media (min-width: 800px) {

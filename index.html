@@ -5,11 +5,12 @@
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.css" integrity="sha512-xIf9AdJauwKIVtrVRZ0i4nHP61Ogx9fSRAkCLecmE2dL/U8ioWpDvFCAy4dcfecN72HHB9+7FfQj3aiO68aaaw==" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/lint/lint.min.css" integrity="sha512-6Owk90V+dmnBh35Q/OWxqfmLXExGMWDwb7tijRebrz7lLkDxZ7RS+eiNQmpUPrlWtpQulb/BkatkyPwPkMhpUQ==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="./cm-theme.css" />
   </head>
   <body>
-    <h1>RNP</h1>
     <main>
       <section id="input-section">
+        <h1>RNP</h1>
         <textarea id="input" autocomplete="off">alias event = (M:Event, string);
 alias rudderTrimtabPos = (L:RudderTrimtabPos, number);
 
@@ -32,13 +33,6 @@ if event == 'LeftDrag' {
     (L:LastPos) = (M:X);
   }
 }
-if event == 'LeftRelease' {
-  (L:RudderTrimtabPos) = 50;
-}
-if event == 'Leave' {
-  (L:RudderTrimtabPos) = 50;
-}
-
 
 macro mapf($n, $inMin, $inMax, $outMin, $outMax) {
   ($n - $inMin) * ($outMax - $outMin) / ($inMax - $inMin) + $outMin
@@ -54,12 +48,15 @@ let throttle = (A:GENERAL ENG THROTTLE LEVER POSITION:#ID#, percent);
 (L:Hello) = 'hello, world'.toUpperCase();</textarea>
       </section>
       <section id="output-section">
-        <h2>Output:</h2>
+        <h2>RPN</h2>
         <div id="output"></div>
       </section>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.js" integrity="sha512-zuvaVNiXwWY7U7HEdXsoTislTEElpKLELFoyQw0Bg7zfGhC4vG8eAhCxIQAvHmprW7dFhTq5zshUko4K3B4mSA==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/lint/lint.min.js" integrity="sha512-VDabhEJKZttezx9vFT88J4+02yBCM7ebSYisA72aX0d2KJ6iuAXZjbZVXOsClAPdhTPMbq97D22VShP2kAu5/g==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/edit/closebrackets.min.js" integrity="sha512-B+mNfayB2LLir8I9Dy+0F2JTkRB9JxNC6+lHRo48ni7MRNe/U6pH7JfDy8zuI28AHYKMHi7/nylf3rOEGl9HFA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/edit/matchbrackets.min.js" integrity="sha512-GlBJlDrIKL93TzLT5WYpPw9wRicOOghofNDodqg9WXPyLLFFb4RSERKonID8LLs6GpCCgXCbEGIraojzI+ngPA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/selection/active-line.min.js" integrity="sha512-UNVAZmixdjeBtJVQcH5eSKXuVdzbSV6rzfTfNVyYWUIIDCdI9/G8/Z/nWplnSHXXxz9U8TA1BiJ1trK7abL/dg==" crossorigin="anonymous"></script>
     <script src="./cm-simple.js"></script>
     <script type="module" src="./main.mjs"></script>
   </body>
