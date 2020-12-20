@@ -5,11 +5,11 @@ import rnp from './rnp.mjs';
 
 CodeMirror.defineSimpleMode('rnp', {
   start: [
+    { regex: /(?:if|else|let|alias|macro|import|export|from)\b/, token: 'keyword' },
+    { regex: /(?:true|false)\b|\(.:.+?\)/, token: 'atom' },
     { regex: /\$\p{ID_Continue}*/u, token: 'variable-2' },
     { regex: /\p{ID_Start}\p{ID_Continue}*/u, token: 'variable' },
     { regex: /'(?:[^\\]|\\.)*?(?:'|$)/, token: 'string' },
-    { regex: /(?:if|else|let|alias|macro|import|export|from)\b/, token: 'keyword' },
-    { regex: /(?:true|false)\b|\(.:.+?\)/, token: 'atom' },
     { regex: /-?0x[a-f\d]+|-?0b[01]+|-?(?:\.\d+|\d+\.?\d*)(?:e-?\d+)?/i, token: 'number' },
     { regex: /[-+/*=<>!]+/, token: 'operator' },
     { regex: /{/, indent: true },
@@ -25,6 +25,8 @@ CodeMirror.defineSimpleMode('rnp', {
   meta: {
     dontIndentStates: ['comment'],
     lineComment: '#',
+    fold: 'brace',
+    closeBrackets: "(){}''",
   },
 });
 
@@ -37,6 +39,10 @@ const editor = CodeMirror.fromTextArea(document.querySelector('#input'), {
   mode: 'rnp',
   gutters: ['CodeMirror-lint-markers'],
   lint: true,
+  theme: 'rnp-dark',
+  autoCloseBrackets: true,
+  matchBrackets: true,
+  styleActiveLine: true,
 });
 
 function translate() {
