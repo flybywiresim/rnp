@@ -1,0 +1,7 @@
+(L:X) = if true {};
+---
+ --> fail/simvar-assign-void.rnp:1:9
+  |
+1 | (L:X) = if true {};
+  |         ^^^^^^^^^^ Expected a value but got void
+  |

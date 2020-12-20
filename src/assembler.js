@@ -267,6 +267,8 @@ class Assembler {
           if (t0 !== SimVarTypes[node.left.value.type]) {
             this.raise(TypeError, `Expected ${SimVarTypes[node.left.value.type]} but got ${t0}`, node.right);
           }
+        } else if (t0 === Type.VOID) {
+          this.raise(TypeError, `Expected a value but got ${t0}`, node.right);
         }
         this.emit(`(>${formatSimVar(node.left.value)})`);
         break;
