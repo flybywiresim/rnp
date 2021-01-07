@@ -51,7 +51,7 @@ const {
 Comment out a single line.
 
 ```rnp
-# this is a line comment
+// this is a line comment
 ```
 
 #### Block Comments
@@ -59,22 +59,22 @@ Comment out a single line.
 Comment out multiple lines. Nesting is allowed.
 
 ```rnp
-#* this
+/* this
 comment
 is
 longer
-*#
+*/
 ```
 
 ```rnp
-#*
+/*
 
-#*
+/*
 comment doesn't end here
-*#
+*/
 
 comment ends here
-*#
+*/
 ```
 
 ### Declarations
@@ -94,8 +94,8 @@ SimVars can be aliased to local names.
 ```rnp
 alias x = (L:X, bool);
 
-x = true; # set L:X to true
-if x {    # if L:X is true
+x = true; // set L:X to true
+if x {    // if L:X is true
 }
 ```
 
@@ -123,7 +123,7 @@ macro assign($a) {
 }
 
 let b = 0;
-# does not break hygiene rules because `b` was explicitly passed
+// does not break hygiene rules because `b` was explicitly passed
 assign(b);
 ```
 
@@ -159,16 +159,16 @@ Assign a value to a SimVar.
 #### Literals
 
 ```rnp
-# booleans
+// booleans
 true;
 false;
 
-# numbers
+// numbers
 1.0;
 0x10;
 0b101010;
 
-# strings
+// strings
 'hello';
 ```
 
@@ -239,11 +239,11 @@ Mathematical and relational operations.
 1 + 1;
 1 / 1;
 'hello' == 'hello';
-# etc...
+// etc...
 
 !true
 ~1
-# etc...
+// etc...
 ```
 
 #### Method Operations

@@ -1,4 +1,4 @@
-# Flags: no-get-source
+// Flags: no-get-source
 import {} from 'x';
 ---
  --> fail/no-get-source.rnp:2:16

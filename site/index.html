@@ -14,7 +14,7 @@
         <textarea id="input" autocomplete="off">alias event = (M:Event, string);
 alias rudderTrimtabPos = (L:RudderTrimtabPos, number);
 
-# Handle some events here.
+// Handle some events here.
 if event == 'LeftSingle' {
   (L:LastPos) = (M:X);
 }
@@ -39,12 +39,12 @@ macro mapf($n, $inMin, $inMax, $outMin, $outMax) {
   ($n - $inMin) * ($outMax - $outMin) / ($inMax - $inMin) + $outMin
 }
 
-#*
+/*
  * A long paragraph explaining in great detail the exact
  * logic that is performed here. There are some edge cases
  * that Dave found in the 7th edition of the maintenance
  * manual that make this code way more complex. Thanks, Dave!
- *#
+ */
 let throttle = (A:GENERAL ENG THROTTLE LEVER POSITION:#ID#, percent);
 (L:MY_THROTTLE) = if throttle > 0 {
   mapf(throttle, 0, 100, 25, 100)

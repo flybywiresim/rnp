@@ -28,7 +28,7 @@ const MaybeAssignTokens = [
   ['SAR', '>>', 11],
   ['MUL', '*', 13],
   ['DIV', '/', 13],
-  ['IDIV', '//', 13, 'div'],
+  ['IDIV', 'idiv', 13, 'div'],
   ['MOD', '%', 13],
   ['EXP', '**', 14, 'pow'],
 
@@ -170,7 +170,7 @@ class Lexer {
         this.raise('Unterminated block comment', this.position);
       }
       switch (this.source[this.position]) {
-        case '#':
+        case '/':
           this.position += 1;
           if (this.source[this.position] === '*') {
             this.position += 1;
@@ -179,7 +179,7 @@ class Lexer {
           break;
         case '*':
           this.position += 1;
-          if (this.source[this.position] === '#') {
+          if (this.source[this.position] === '/') {
             this.position += 1;
             n -= 1;
           }
@@ -207,11 +207,13 @@ class Lexer {
           this.line += 1;
           this.columnOffset = this.position;
           break;
-        case '#':
+        case '/':
           if (this.source[this.position + 1] === '*') {
             this.skipBlockComment();
-          } else {
+          } else if (this.source[this.position + 1] === '/') {
             this.skipLineComment();
+          } else {
+            return;
           }
           break;
         default:

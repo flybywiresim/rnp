@@ -1,4 +1,4 @@
-# RPN only has 50 registers
+// RPN only has 50 registers
 let v0 = 1;
 let v1 = 1;
 let v2 = 1;

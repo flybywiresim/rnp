@@ -1,4 +1,4 @@
-# Flags: return-type=NUMBER
+// Flags: return-type=NUMBER
 ---
  --> fail/prog-t-empty.rnp:2:1
   |

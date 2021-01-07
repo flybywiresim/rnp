@@ -43,7 +43,7 @@ for (const filename of readdir(path.join(__dirname, 'fail'))) {
   const test = path.relative(__dirname, filename);
   tap.test(test, (t) => { // eslint-disable-line no-loop-func
     const [source, expected] = fs.readFileSync(filename, 'utf8').split('---\n');
-    const rawFlags = /# Flags: (.+)/.exec(source);
+    const rawFlags = /\/\/ Flags: (.+)/.exec(source);
     const flags = {};
     if (rawFlags) {
       rawFlags[1]

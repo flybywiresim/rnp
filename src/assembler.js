@@ -9,7 +9,7 @@ const OpTypes = {
   '+': [Type.NUMBER, Type.NUMBER],
   '-': [Type.NUMBER, Type.NUMBER],
   '/': [Type.NUMBER, Type.NUMBER],
-  '//': [Type.NUMBER, Type.NUMBER],
+  'idiv': [Type.NUMBER, Type.NUMBER],
   '*': [Type.NUMBER, Type.NUMBER],
   '%': [Type.NUMBER, Type.NUMBER],
   '**': [Type.NUMBER, Type.NUMBER],

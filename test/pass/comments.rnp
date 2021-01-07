@@ -1,17 +1,17 @@
-# a line comment 1;
+// a line comment 1;
 2;
-#* a
+/* a
 block
-comment 3; *#
+comment 3; */
 4;
-#*
+/*
 nested
-#*
-block * #
-*#
+/*
+block * /
+*/
 5;
 comment
-*#
+*/
 6;
 ---
 2 p
