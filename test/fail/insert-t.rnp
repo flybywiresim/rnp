@@ -1,0 +1,7 @@
+let x = #X#;
+---
+ --> fail/insert-t.rnp:1:9
+  |
+1 | let x = #X#;
+  |         ^^^ Expected a type
+  |

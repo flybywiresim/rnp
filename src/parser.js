@@ -150,6 +150,12 @@ class Parser extends Lexer {
         expr.statement = true;
         return expr;
       }
+      case Token.INSERT: {
+        const expr = this.parseInsert();
+        this.expect(Token.SEMICOLON);
+        expr.statement = true;
+        return expr;
+      }
       default: {
         const expr = this.parseExpression();
         if ((expr.type === 'SimVar' || expr.type === 'Identifier')
@@ -407,6 +413,8 @@ class Parser extends Lexer {
       }
       case Token.SIMVAR:
         return this.parseSimVar();
+      case Token.INSERT:
+        return this.parseInsert();
       case Token.IF:
         return this.parseIf();
       case Token.LBRACE:
@@ -434,10 +442,21 @@ class Parser extends Lexer {
 
   // SimVar :
   //   `(` any char `:` any chars `)`
+  //   `(` any char `:` any chars `,` any chars `)`
   parseSimVar() {
     const node = this.startNode();
     node.value = this.expect(Token.SIMVAR).value;
     return this.finishNode(node, 'SimVar');
+  }
+
+  // Insert :
+  //   `#` any char `#`
+  //   `#` any char `,` any char `#`
+  parseInsert() {
+    const node = this.startNode();
+    node.statement = false;
+    node.value = this.expect(Token.INSERT).value;
+    return this.finishNode(node, 'Insert');
   }
 
   // StringLiteral :

@@ -189,6 +189,18 @@ Reference a SimVar.
 (X:Y, unit)
 ```
 
+#### Inserts
+
+Allows XML substitutions. Expressions must be typed.
+
+```rnp
+let x = #X, bool#;
+```
+
+```rnp
+#Y#;
+```
+
 #### Macro Expansion
 
 Expand a macro.

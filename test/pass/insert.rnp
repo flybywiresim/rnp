@@ -1,0 +1,12 @@
+#X#;
+let y = #Y, bool#;
+if y {}
+let z = #Z, number#;
+z + 1;
+---
+#X#
+#Y# sp0
+l0 if{
+}
+#Z# sp1
+l1 1 + p

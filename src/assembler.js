@@ -452,6 +452,18 @@ class Assembler {
     this.push(SimVarTypes[node.value.type] || Type.ANY);
   }
 
+  visitInsert(node) {
+    this.emit(`#${node.value.name}#`);
+    if (node.value.type) {
+      if (!SimVarTypes[node.value.type]) {
+        this.raise(TypeError, `${node.value.type} is not a valid type`, node);
+      }
+      this.push(SimVarTypes[node.value.type]);
+    } else if (!node.statement) {
+      this.raise(TypeError, 'Expected a type', node);
+    }
+  }
+
   visitIf(node) {
     this.visit(node.test);
     const t = this.pop();

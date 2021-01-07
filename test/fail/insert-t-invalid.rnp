@@ -1,0 +1,7 @@
+#X, invalid#;
+---
+ --> fail/insert-t-invalid.rnp:1:1
+  |
+1 | #X, invalid#;
+  | ^^^^^^^^^^^^ invalid is not a valid type
+  |

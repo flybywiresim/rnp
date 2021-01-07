@@ -33,7 +33,7 @@ CodeMirror.defineMode('rnp', (config) => ({
     if (stream.match(/(?:if|else|let|alias|macro|import|export|from)\b/)) {
       return 'keyword';
     }
-    if (stream.match(/(?:true|false)\b|\(.:.+?\)/)) {
+    if (stream.match(/(?:true|false)\b|\(.:.+?\)|#.+?#/)) {
       return 'atom';
     }
     if (stream.match(/(?:[-+/*=<>!]+)|(?:(?:and|or)\b)/)) {
