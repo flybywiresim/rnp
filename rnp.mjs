@@ -1,5 +1,5 @@
 /*!
- * @flybywiresim/rnp 1.1.1
+ * @flybywiresim/rnp 2.0.0
  *
  * MIT License
  * 
