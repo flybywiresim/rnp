@@ -288,7 +288,7 @@ const MaybeAssignTokens = [
   ['SAR', '>>', 11],
   ['MUL', '*', 13],
   ['DIV', '/', 13],
-  ['IDIV', '//', 13, 'div'],
+  ['IDIV', 'idiv', 13, 'div'],
   ['MOD', '%', 13],
   ['EXP', '**', 14, 'pow'],
 
@@ -333,6 +333,7 @@ const MaybeAssignTokens = [
   ['IDENTIFIER', null],
   ['MACRO_IDENTIFIER', null],
   ['SIMVAR', null],
+  ['INSERT', null],
   ['EOS', null],
 
   ['COMMA', ','],
@@ -430,7 +431,7 @@ class Lexer {
         this.raise('Unterminated block comment', this.position);
       }
       switch (this.source[this.position]) {
-        case '#':
+        case '/':
           this.position += 1;
           if (this.source[this.position] === '*') {
             this.position += 1;
@@ -439,7 +440,7 @@ class Lexer {
           break;
         case '*':
           this.position += 1;
-          if (this.source[this.position] === '#') {
+          if (this.source[this.position] === '/') {
             this.position += 1;
             n -= 1;
           }
@@ -467,11 +468,13 @@ class Lexer {
           this.line += 1;
           this.columnOffset = this.position;
           break;
-        case '#':
+        case '/':
           if (this.source[this.position + 1] === '*') {
             this.skipBlockComment();
-          } else {
+          } else if (this.source[this.position + 1] === '/') {
             this.skipLineComment();
+          } else {
+            return;
           }
           break;
         default:
@@ -527,6 +530,8 @@ class Lexer {
           return this.scanSimVar();
         }
         return Token.LPAREN;
+      case '#':
+        return this.scanInsert();
       default: {
         const start = this.position;
         if (isIDStart(this.source[this.position]) || this.source[this.position] === '$') {
@@ -666,6 +671,33 @@ class Lexer {
       : this.source.slice(typeStart + 1, this.position - 1).trim();
     this.scannedValue = { name, type };
     return Token.SIMVAR;
+  }
+
+  scanInsert() {
+    this.position += 1;
+    const nameStart = this.position;
+    let typeStart = -1;
+    while (true) { // eslint-disable-line no-constant-condition
+      if (this.position >= this.source.length || this.source[this.position] === '\n') {
+        this.raise('Unexpected end of insert', this.position);
+      }
+      if (typeStart === -1 && this.source[this.position] === ',') {
+        typeStart = this.position;
+      }
+      if (this.source[this.position] === '#') {
+        break;
+      }
+      this.position += 1;
+    }
+    this.position += 1;
+    const name = this.source
+      .slice(nameStart, typeStart === -1 ? this.position - 1 : typeStart)
+      .trim();
+    const type = typeStart === -1
+      ? null
+      : this.source.slice(typeStart + 1, this.position - 1).trim();
+    this.scannedValue = { name, type };
+    return Token.INSERT;
   }
 }
 
@@ -824,6 +856,12 @@ class Parser extends Lexer$1 {
       }
       case Token$1.LBRACE: {
         const expr = this.parseBlock();
+        expr.statement = true;
+        return expr;
+      }
+      case Token$1.INSERT: {
+        const expr = this.parseInsert();
+        this.expect(Token$1.SEMICOLON);
         expr.statement = true;
         return expr;
       }
@@ -1084,6 +1122,8 @@ class Parser extends Lexer$1 {
       }
       case Token$1.SIMVAR:
         return this.parseSimVar();
+      case Token$1.INSERT:
+        return this.parseInsert();
       case Token$1.IF:
         return this.parseIf();
       case Token$1.LBRACE:
@@ -1111,10 +1151,21 @@ class Parser extends Lexer$1 {
 
   // SimVar :
   //   `(` any char `:` any chars `)`
+  //   `(` any char `:` any chars `,` any chars `)`
   parseSimVar() {
     const node = this.startNode();
     node.value = this.expect(Token$1.SIMVAR).value;
     return this.finishNode(node, 'SimVar');
+  }
+
+  // Insert :
+  //   `#` any char `#`
+  //   `#` any char `,` any char `#`
+  parseInsert() {
+    const node = this.startNode();
+    node.statement = false;
+    node.value = this.expect(Token$1.INSERT).value;
+    return this.finishNode(node, 'Insert');
   }
 
   // StringLiteral :
@@ -1174,7 +1225,7 @@ const OpTypes = {
   '+': [Type$1.NUMBER, Type$1.NUMBER],
   '-': [Type$1.NUMBER, Type$1.NUMBER],
   '/': [Type$1.NUMBER, Type$1.NUMBER],
-  '//': [Type$1.NUMBER, Type$1.NUMBER],
+  'idiv': [Type$1.NUMBER, Type$1.NUMBER],
   '*': [Type$1.NUMBER, Type$1.NUMBER],
   '%': [Type$1.NUMBER, Type$1.NUMBER],
   '**': [Type$1.NUMBER, Type$1.NUMBER],
@@ -1615,6 +1666,18 @@ class Assembler {
   visitSimVar(node) {
     this.emit(`(${formatSimVar(node.value)})`);
     this.push(SimVarTypes$1[node.value.type] || Type$1.ANY);
+  }
+
+  visitInsert(node) {
+    this.emit(`#${node.value.name}#`);
+    if (node.value.type) {
+      if (!SimVarTypes$1[node.value.type]) {
+        this.raise(TypeError, `${node.value.type} is not a valid type`, node);
+      }
+      this.push(SimVarTypes$1[node.value.type]);
+    } else if (!node.statement) {
+      this.raise(TypeError, 'Expected a type', node);
+    }
   }
 
   visitIf(node) {

@@ -11,11 +11,11 @@ CodeMirror.defineMode('rnp', (config) => ({
     };
   },
   token(stream, state) {
-    if (stream.match('#*')) {
+    if (stream.match('/*')) {
       state.blockComment += 1;
       return 'comment';
     }
-    if (stream.match('*#')) {
+    if (stream.match('*/')) {
       state.blockComment -= 1;
       return 'comment';
     }
@@ -23,7 +23,7 @@ CodeMirror.defineMode('rnp', (config) => ({
       stream.next();
       return 'comment';
     }
-    if (stream.eat('#')) {
+    if (stream.match('//')) {
       stream.skipToEnd();
       return 'comment';
     }
@@ -33,7 +33,7 @@ CodeMirror.defineMode('rnp', (config) => ({
     if (stream.match(/(?:if|else|let|alias|macro|import|export|from)\b/)) {
       return 'keyword';
     }
-    if (stream.match(/(?:true|false)\b|\(.:.+?\)/)) {
+    if (stream.match(/(?:true|false)\b|\(.:.+?\)|#.+?#/)) {
       return 'atom';
     }
     if (stream.match(/(?:[-+/*=<>!]+)|(?:(?:and|or)\b)/)) {
@@ -71,9 +71,9 @@ CodeMirror.defineMode('rnp', (config) => ({
     }
     return pos < 0 ? 0 : state.indent[pos];
   },
-  lineComment: '#',
-  blockCommentStart: '#*',
-  blockCommendEnd: '*#',
+  lineComment: '//',
+  blockCommentStart: '/*',
+  blockCommendEnd: '*/',
   closeBrackets: '(){}\'\'',
 }));
 
