@@ -21,6 +21,7 @@ function translate(source, {
       messages: warnings.map((w) => ({
         level: 'warning',
         ...w,
+        stack: undefined,
       })),
     };
   } catch (e) {
@@ -31,6 +32,7 @@ function translate(source, {
         messages: [{
           level: 'error',
           ...e[kMessage],
+          stack: e.stack,
         }],
       };
     }
