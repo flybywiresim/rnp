@@ -2,7 +2,7 @@
   "name": "@flybywiresim/rnp",
   "main": "src/index.js",
   "description": "RNP is a language which compiles to [RPN][], a scripting language used by MSFS.",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "scripts": {
     "lint": "eslint --cache src test .eslintrc.js",
     "test": "tap --100",
