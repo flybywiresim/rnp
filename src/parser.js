@@ -150,12 +150,6 @@ class Parser extends Lexer {
         expr.statement = true;
         return expr;
       }
-      case Token.INSERT: {
-        const expr = this.parseInsert();
-        this.expect(Token.SEMICOLON);
-        expr.statement = true;
-        return expr;
-      }
       default: {
         const expr = this.parseExpression();
         if ((expr.type === 'SimVar' || expr.type === 'Identifier')
@@ -163,6 +157,9 @@ class Parser extends Lexer {
           return this.parseAssignment(expr);
         }
         if (this.eat(Token.SEMICOLON)) {
+          if (expr.type === 'Insert') {
+            expr.statement = true;
+          }
           return expr;
         }
         if (!this.test(end)) {
