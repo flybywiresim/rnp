@@ -31,7 +31,7 @@ function createCommonjsModule(fn) {
 
 const kMessage = Symbol('kMessage');
 
-function createMessage(source, location, specifier, message) {
+function createMessage$1(source, location, specifier, message) {
   if (location.start.line === location.end.line) {
     const offset = location.start.column - 1;
     const length = location.end.column - location.start.column;
@@ -75,11 +75,11 @@ ${mapped}
 ${pad} |`;
 }
 
-function createError(T, source, location, specifier, message) {
+function createError$2(T, source, location, specifier, message) {
   const payload = {
     message,
     location,
-    detail: createMessage(source, location, specifier, message),
+    detail: createMessage$1(source, location, specifier, message),
   };
   const e = new T(message);
   const oldPST = Error.prepareStackTrace;
@@ -93,9 +93,9 @@ ${e.stack}`;
   return e;
 }
 
-var util = { createError, createMessage, kMessage };
+var util = { createError: createError$2, createMessage: createMessage$1, kMessage };
 
-class Type {
+class Type$1 {
   constructor(name) {
     this.name = name.toLowerCase();
   }
@@ -112,15 +112,15 @@ class Type {
   'STRING',
   'VOID',
 ].forEach((t) => {
-  Type[t] = new Type(t);
+  Type$1[t] = new Type$1(t);
 });
 
 // https://www.prepar3d.com/SDKv5/sdk/references/variables/units_of_measurement.html
-const SimVarTypes = {
-  bool: Type.BOOLEAN,
-  boolean: Type.BOOLEAN,
-  number: Type.NUMBER,
-  string: Type.STRING,
+const SimVarTypes$1 = {
+  bool: Type$1.BOOLEAN,
+  boolean: Type$1.BOOLEAN,
+  number: Type$1.NUMBER,
+  string: Type$1.STRING,
 };
 
 // All the number types
@@ -252,12 +252,12 @@ const SimVarTypes = {
   'position 32k',
   'enum',
 ].forEach((n) => {
-  SimVarTypes[n] = Type.NUMBER;
+  SimVarTypes$1[n] = Type$1.NUMBER;
 });
 
 var type = {
-  Type,
-  SimVarTypes,
+  Type: Type$1,
+  SimVarTypes: SimVarTypes$1,
 };
 
 const IDENT_START_RE = /\p{ID_Start}/u;
@@ -266,11 +266,11 @@ const IDENT_CONTINUE_RE = /\p{ID_Continue}/u;
 const isIDStart = (c) => c && IDENT_START_RE.test(c);
 const isIDContinue = (c) => c && IDENT_CONTINUE_RE.test(c);
 
-const Token = {};
+const Token$1 = {};
 const TokenNames = {};
 const TokenValues = {};
-const TokenPrecedence = {};
-const OperatorOverload = {};
+const TokenPrecedence$1 = {};
+const OperatorOverload$1 = {};
 const Keywords = Object.create(null);
 
 const LexTree = {};
@@ -333,7 +333,7 @@ const MaybeAssignTokens = [
   ['IDENTIFIER', null],
   ['MACRO_IDENTIFIER', null],
   ['SIMVAR', null],
-  ['INSERT', null],
+  ['TEMPLATE', null],
   ['EOS', null],
 
   ['COMMA', ','],
@@ -344,17 +344,17 @@ const MaybeAssignTokens = [
   ['RBRACE', '}'],
   ['PERIOD', '.'],
 ].forEach(([name, v, prec, overload], i) => {
-  Token[name] = i;
+  Token$1[name] = i;
   TokenNames[i] = name;
   TokenValues[i] = v;
-  TokenPrecedence[name] = prec || 0;
-  TokenPrecedence[i] = TokenPrecedence[name];
+  TokenPrecedence$1[name] = prec || 0;
+  TokenPrecedence$1[i] = TokenPrecedence$1[name];
   if (name.toLowerCase() === v) {
     Keywords[v] = i;
   }
 
   if (overload) {
-    OperatorOverload[v] = overload;
+    OperatorOverload$1[v] = overload;
   }
 
   if (v) {
@@ -367,7 +367,7 @@ const MaybeAssignTokens = [
   }
 });
 
-class Lexer {
+class Lexer$1 {
   constructor(source) {
     this.source = source;
     this.position = 0;
@@ -507,7 +507,7 @@ class Lexer {
     this.columnForNextToken = this.position - this.columnOffset + 1;
 
     if (this.position >= this.source.length) {
-      return Token.EOS;
+      return Token$1.EOS;
     }
 
     switch (this.source[this.position]) {
@@ -529,9 +529,9 @@ class Lexer {
         if (this.source[this.position + 1] === ':') {
           return this.scanSimVar();
         }
-        return Token.LPAREN;
+        return Token$1.LPAREN;
       case '#':
-        return this.scanInsert();
+        return this.scanTemplate();
       default: {
         const start = this.position;
         if (isIDStart(this.source[this.position]) || this.source[this.position] === '$') {
@@ -544,8 +544,8 @@ class Lexer {
             return Keywords[this.scannedValue];
           }
           return this.scannedValue.startsWith('$')
-            ? Token.MACRO_IDENTIFIER
-            : Token.IDENTIFIER;
+            ? Token$1.MACRO_IDENTIFIER
+            : Token$1.IDENTIFIER;
         }
         if (this.source[this.position] === '-'
             && /\d/.test(this.source[this.position + 1])) {
@@ -591,7 +591,7 @@ class Lexer {
           break;
         default:
           this.scannedValue = 0;
-          return Token.NUMBER;
+          return Token$1.NUMBER;
       }
     }
     const check = {
@@ -622,7 +622,7 @@ class Lexer {
     this.scannedValue = base === 10
       ? Number.parseFloat(buffer, base)
       : Number.parseInt(buffer, base);
-    return Token.NUMBER;
+    return Token$1.NUMBER;
   }
 
   scanString() {
@@ -644,7 +644,7 @@ class Lexer {
       buffer += c;
     }
     this.scannedValue = buffer;
-    return Token.STRING;
+    return Token$1.STRING;
   }
 
   scanSimVar() {
@@ -670,16 +670,16 @@ class Lexer {
       ? null
       : this.source.slice(typeStart + 1, this.position - 1).trim();
     this.scannedValue = { name, type };
-    return Token.SIMVAR;
+    return Token$1.SIMVAR;
   }
 
-  scanInsert() {
+  scanTemplate() {
     this.position += 1;
     const nameStart = this.position;
     let typeStart = -1;
     while (true) { // eslint-disable-line no-constant-condition
       if (this.position >= this.source.length || this.source[this.position] === '\n') {
-        this.raise('Unexpected end of insert', this.position);
+        this.raise('Unexpected end of template', this.position);
       }
       if (typeStart === -1 && this.source[this.position] === ',') {
         typeStart = this.position;
@@ -697,26 +697,26 @@ class Lexer {
       ? null
       : this.source.slice(typeStart + 1, this.position - 1).trim();
     this.scannedValue = { name, type };
-    return Token.INSERT;
+    return Token$1.TEMPLATE;
   }
 }
 
 var lexer = {
-  Lexer,
-  Token,
-  TokenPrecedence,
-  TokenNames,
-  OperatorOverload,
-};
-
-const {
   Lexer: Lexer$1,
   Token: Token$1,
   TokenPrecedence: TokenPrecedence$1,
+  TokenNames,
+  OperatorOverload: OperatorOverload$1,
+};
+
+const {
+  Lexer,
+  Token,
+  TokenPrecedence,
 } = lexer;
 const { createError: createError$1 } = util;
 
-class Parser extends Lexer$1 {
+class Parser$1 extends Lexer {
   constructor(source, specifier) {
     super(source);
     this.specifier = specifier;
@@ -725,12 +725,12 @@ class Parser extends Lexer$1 {
   }
 
   static parse(source, specifier) {
-    const p = new Parser(source, specifier);
+    const p = new Parser$1(source, specifier);
     return p.parseProgram();
   }
 
   raise(message, context = this.peek()) {
-    if (context.type === Token$1.EOS && message === 'Unexpected token') {
+    if (context.type === Token.EOS && message === 'Unexpected token') {
       message = 'Unexpected end of source';
     }
 
@@ -738,7 +738,7 @@ class Parser extends Lexer$1 {
     let startColumn;
     let endColumn;
 
-    if (typeof context === 'number' || context.type === Token$1.EOS) {
+    if (typeof context === 'number' || context.type === Token.EOS) {
       line = this.line;
       let startIndex = typeof context === 'number' ? context : context.startIndex;
       if (startIndex === this.source.length) {
@@ -812,7 +812,7 @@ class Parser extends Lexer$1 {
   //   StatementList
   parseProgram() {
     const node = this.startNode();
-    node.statements = this.parseStatementList(Token$1.EOS);
+    node.statements = this.parseStatementList(Token.EOS);
     return this.finishNode(node, 'Program');
   }
 
@@ -837,24 +837,24 @@ class Parser extends Lexer$1 {
   //   Expression `;`
   parseStatement(end) {
     switch (this.peek().type) {
-      case Token$1.IMPORT:
+      case Token.IMPORT:
         return this.parseImportDeclaration();
-      case Token$1.LET:
+      case Token.LET:
         return this.parseLocalDeclaration();
-      case Token$1.ALIAS:
+      case Token.ALIAS:
         return this.parseAliasDeclaration();
-      case Token$1.EXPORT:
-      case Token$1.MACRO:
+      case Token.EXPORT:
+      case Token.MACRO:
         if (this.insideMacro) {
           this.raise('Cannot declare macro inside macro');
         }
         return this.parseMacroDeclaration();
-      case Token$1.IF: {
+      case Token.IF: {
         const expr = this.parseIf();
         expr.statement = true;
         return expr;
       }
-      case Token$1.LBRACE: {
+      case Token.LBRACE: {
         const expr = this.parseBlock();
         expr.statement = true;
         return expr;
@@ -862,11 +862,11 @@ class Parser extends Lexer$1 {
       default: {
         const expr = this.parseExpression();
         if ((expr.type === 'SimVar' || expr.type === 'Identifier')
-            && TokenPrecedence$1[this.peek().type] === TokenPrecedence$1.ASSIGN) {
+            && TokenPrecedence[this.peek().type] === TokenPrecedence.ASSIGN) {
           return this.parseAssignment(expr);
         }
-        if (this.eat(Token$1.SEMICOLON)) {
-          if (expr.type === 'Insert') {
+        if (this.eat(Token.SEMICOLON)) {
+          if (expr.type === 'Template') {
             expr.statement = true;
           }
           return expr;
@@ -889,19 +889,19 @@ class Parser extends Lexer$1 {
   //   `import` `{` names `}` from StringLiteral `;`
   parseImportDeclaration() {
     const node = this.startNode();
-    this.expect(Token$1.IMPORT);
-    this.expect(Token$1.LBRACE);
+    this.expect(Token.IMPORT);
+    this.expect(Token.LBRACE);
     node.imports = [];
-    while (!this.eat(Token$1.RBRACE)) {
+    while (!this.eat(Token.RBRACE)) {
       node.imports.push(this.parseIdentifier());
-      if (this.eat(Token$1.RBRACE)) {
+      if (this.eat(Token.RBRACE)) {
         break;
       }
-      this.expect(Token$1.COMMA);
+      this.expect(Token.COMMA);
     }
-    this.expect(Token$1.FROM);
+    this.expect(Token.FROM);
     node.specifier = this.parseStringLiteral();
-    this.expect(Token$1.SEMICOLON);
+    this.expect(Token.SEMICOLON);
     return this.finishNode(node, 'ImportDeclaration');
   }
 
@@ -909,11 +909,11 @@ class Parser extends Lexer$1 {
   //   `let` Identifier `=` Expression `;`
   parseLocalDeclaration() {
     const node = this.startNode();
-    this.expect(Token$1.LET);
+    this.expect(Token.LET);
     node.name = this.parseIdentifier();
-    this.expect(Token$1.ASSIGN);
+    this.expect(Token.ASSIGN);
     node.value = this.parseExpression();
-    this.expect(Token$1.SEMICOLON);
+    this.expect(Token.SEMICOLON);
     return this.finishNode(node, 'LocalDeclaration');
   }
 
@@ -921,14 +921,14 @@ class Parser extends Lexer$1 {
   //   `alias` Identifier `=` SimVar `;`
   parseAliasDeclaration() {
     const node = this.startNode();
-    this.expect(Token$1.ALIAS);
+    this.expect(Token.ALIAS);
     node.name = this.parseIdentifier();
-    this.expect(Token$1.ASSIGN);
+    this.expect(Token.ASSIGN);
     node.simvar = this.parseSimVar();
     if (!node.simvar.value.type) {
       this.raise('Aliased simvars must have a unit', node.simvar);
     }
-    this.expect(Token$1.SEMICOLON);
+    this.expect(Token.SEMICOLON);
     return this.finishNode(node, 'AliasDeclaration');
   }
 
@@ -936,20 +936,20 @@ class Parser extends Lexer$1 {
   //   `export`? `macro` Identifier `(` Parameters `)` Block
   parseMacroDeclaration() {
     const node = this.startNode();
-    node.isExported = this.isTopLevel && this.eat(Token$1.EXPORT);
-    this.expect(Token$1.MACRO);
+    node.isExported = this.isTopLevel && this.eat(Token.EXPORT);
+    this.expect(Token.MACRO);
     node.name = this.parseIdentifier();
-    this.expect(Token$1.LPAREN);
+    this.expect(Token.LPAREN);
     node.parameters = [];
     while (true) { // eslint-disable-line no-constant-condition
-      if (this.eat(Token$1.RPAREN)) {
+      if (this.eat(Token.RPAREN)) {
         break;
       }
       node.parameters.push(this.parseMacroIdentifier());
-      if (this.eat(Token$1.RPAREN)) {
+      if (this.eat(Token.RPAREN)) {
         break;
       }
-      this.expect(Token$1.COMMA);
+      this.expect(Token.COMMA);
     }
     this.insideMacro = true;
     node.body = this.parseBlock();
@@ -965,7 +965,7 @@ class Parser extends Lexer$1 {
   parseAssignment(left) {
     const node = this.startNode(left);
     node.left = left;
-    if (this.eat(Token$1.ASSIGN)) {
+    if (this.eat(Token.ASSIGN)) {
       node.right = this.parseExpression();
     } else {
       const binop = this.startNode(left);
@@ -974,24 +974,24 @@ class Parser extends Lexer$1 {
       binop.right = this.parseExpression();
       node.right = this.finishNode(binop, 'BinaryExpression');
     }
-    this.expect(Token$1.SEMICOLON);
+    this.expect(Token.SEMICOLON);
     return this.finishNode(node, 'Assignment');
   }
 
   // Expression :
   //   AssignmentExpression
   parseExpression() {
-    return this.parseBinaryExpression(TokenPrecedence$1.OR);
+    return this.parseBinaryExpression(TokenPrecedence.OR);
   }
 
   // BinaryExpression :
   //   a lot of rules ok
   parseBinaryExpression(precedence, initialX = this.parseUnaryExpression()) {
-    let p = TokenPrecedence$1[this.peek().type];
+    let p = TokenPrecedence[this.peek().type];
     let x = initialX;
     if (p >= precedence) {
       do {
-        while (TokenPrecedence$1[this.peek().type] === p) {
+        while (TokenPrecedence[this.peek().type] === p) {
           const node = this.startNode(x);
           node.left = x;
           node.operator = this.next().value;
@@ -1012,9 +1012,9 @@ class Parser extends Lexer$1 {
   parseUnaryExpression() {
     const node = this.startNode();
     switch (this.peek().type) {
-      case Token$1.NOT:
-      case Token$1.BIT_NOT:
-      case Token$1.SUB:
+      case Token.NOT:
+      case Token.BIT_NOT:
+      case Token.SUB:
         node.operator = this.next().value;
         node.operand = this.parseUnaryExpression();
         return this.finishNode(node, 'UnaryExpression');
@@ -1028,7 +1028,7 @@ class Parser extends Lexer$1 {
   //   MethodExpression `.` Identifier `(` Arguments `)`
   parseMethodExpression() {
     let left = this.parseMacroExpansion();
-    while (this.eat(Token$1.PERIOD)) {
+    while (this.eat(Token.PERIOD)) {
       const node = this.startNode(left);
       node.target = left;
       node.callee = this.parseIdentifier();
@@ -1043,7 +1043,7 @@ class Parser extends Lexer$1 {
   //   Identifier `(` Arguments `)`
   parseMacroExpansion() {
     const left = this.parsePrimaryExpression();
-    if (left.type === 'Identifier' && this.test(Token$1.LPAREN)) {
+    if (left.type === 'Identifier' && this.test(Token.LPAREN)) {
       const node = this.startNode(left);
       node.name = left;
       node.arguments = this.parseArguments();
@@ -1058,16 +1058,16 @@ class Parser extends Lexer$1 {
   //   Expression
   //   ArgumentList `,` Expression
   parseArguments() {
-    const startParen = this.expect(Token$1.LPAREN);
+    const startParen = this.expect(Token.LPAREN);
     const args = [];
-    while (!this.test(Token$1.RPAREN)) {
+    while (!this.test(Token.RPAREN)) {
       args.push(this.parseExpression());
-      if (this.test(Token$1.RPAREN)) {
+      if (this.test(Token.RPAREN)) {
         break;
       }
-      this.expect(Token$1.COMMA);
+      this.expect(Token.COMMA);
     }
-    const endParen = this.expect(Token$1.RPAREN);
+    const endParen = this.expect(Token.RPAREN);
     args.location = {
       start: {
         line: startParen.line,
@@ -1091,39 +1091,39 @@ class Parser extends Lexer$1 {
   //   If
   parsePrimaryExpression() {
     switch (this.peek().type) {
-      case Token$1.IDENTIFIER:
+      case Token.IDENTIFIER:
         return this.parseIdentifier();
-      case Token$1.MACRO_IDENTIFIER:
+      case Token.MACRO_IDENTIFIER:
         if (!this.insideMacro) {
           this.unexpected();
         }
         return this.parseMacroIdentifier();
-      case Token$1.TRUE:
-      case Token$1.FALSE: {
+      case Token.TRUE:
+      case Token.FALSE: {
         const node = this.startNode();
         node.value = this.next().value === 'true';
         return this.finishNode(node, 'BooleanLiteral');
       }
-      case Token$1.NUMBER: {
+      case Token.NUMBER: {
         const node = this.startNode();
         node.value = this.next().value;
         return this.finishNode(node, 'NumberLiteral');
       }
-      case Token$1.STRING:
+      case Token.STRING:
         return this.parseStringLiteral();
-      case Token$1.LPAREN: {
+      case Token.LPAREN: {
         this.next();
         const node = this.parseExpression();
-        this.expect(Token$1.RPAREN);
+        this.expect(Token.RPAREN);
         return node;
       }
-      case Token$1.SIMVAR:
+      case Token.SIMVAR:
         return this.parseSimVar();
-      case Token$1.INSERT:
-        return this.parseInsert();
-      case Token$1.IF:
+      case Token.TEMPLATE:
+        return this.parseTemplate();
+      case Token.IF:
         return this.parseIf();
-      case Token$1.LBRACE:
+      case Token.LBRACE:
         return this.parseBlock();
       default:
         return this.unexpected();
@@ -1134,7 +1134,7 @@ class Parser extends Lexer$1 {
   //   ID_Start ID_Continue*
   parseIdentifier() {
     const node = this.startNode();
-    node.value = this.expect(Token$1.IDENTIFIER).value;
+    node.value = this.expect(Token.IDENTIFIER).value;
     return this.finishNode(node, 'Identifier');
   }
 
@@ -1142,7 +1142,7 @@ class Parser extends Lexer$1 {
   //   `$` ID_Continue*
   parseMacroIdentifier() {
     const node = this.startNode();
-    node.value = this.expect(Token$1.MACRO_IDENTIFIER).value;
+    node.value = this.expect(Token.MACRO_IDENTIFIER).value;
     return this.finishNode(node, 'MacroIdentifier');
   }
 
@@ -1151,25 +1151,25 @@ class Parser extends Lexer$1 {
   //   `(` any char `:` any chars `,` any chars `)`
   parseSimVar() {
     const node = this.startNode();
-    node.value = this.expect(Token$1.SIMVAR).value;
+    node.value = this.expect(Token.SIMVAR).value;
     return this.finishNode(node, 'SimVar');
   }
 
-  // Insert :
+  // Template :
   //   `#` any char `#`
   //   `#` any char `,` any char `#`
-  parseInsert() {
+  parseTemplate() {
     const node = this.startNode();
     node.statement = false;
-    node.value = this.expect(Token$1.INSERT).value;
-    return this.finishNode(node, 'Insert');
+    node.value = this.expect(Token.TEMPLATE).value;
+    return this.finishNode(node, 'Template');
   }
 
   // StringLiteral :
   //   `'` any chars `'`
   parseStringLiteral() {
     const node = this.startNode();
-    node.value = this.expect(Token$1.STRING).value;
+    node.value = this.expect(Token.STRING).value;
     return this.finishNode(node, 'StringLiteral');
   }
 
@@ -1179,12 +1179,12 @@ class Parser extends Lexer$1 {
   //   `if` Expression Block If
   parseIf() {
     const node = this.startNode();
-    this.expect(Token$1.IF);
+    this.expect(Token.IF);
     node.statement = false;
     node.test = this.parseExpression();
     node.consequent = this.parseBlock();
-    if (this.eat(Token$1.ELSE)) {
-      node.alternative = this.test(Token$1.IF)
+    if (this.eat(Token.ELSE)) {
+      node.alternative = this.test(Token.IF)
         ? { // wrap in block for assembler formatting
           type: 'Block',
           statement: false,
@@ -1201,47 +1201,47 @@ class Parser extends Lexer$1 {
   //   `{` StatementList `}`
   parseBlock() {
     const node = this.startNode();
-    this.expect(Token$1.LBRACE);
+    this.expect(Token.LBRACE);
     node.statement = false;
     const oldToplevel = this.isTopLevel;
     this.isTopLevel = false;
-    node.statements = this.parseStatementList(Token$1.RBRACE);
+    node.statements = this.parseStatementList(Token.RBRACE);
     this.isTopLevel = oldToplevel;
     return this.finishNode(node, 'Block');
   }
 }
 
-var parser = { Parser };
+var parser = { Parser: Parser$1 };
 
-const { OperatorOverload: OperatorOverload$1 } = lexer;
-const { Parser: Parser$1 } = parser;
-const { createError: createError$2, createMessage: createMessage$1 } = util;
-const { Type: Type$1, SimVarTypes: SimVarTypes$1 } = type;
+const { OperatorOverload } = lexer;
+const { Parser } = parser;
+const { createError, createMessage } = util;
+const { Type, SimVarTypes } = type;
 
 const OpTypes = {
-  '+': [Type$1.NUMBER, Type$1.NUMBER],
-  '-': [Type$1.NUMBER, Type$1.NUMBER],
-  '/': [Type$1.NUMBER, Type$1.NUMBER],
-  'idiv': [Type$1.NUMBER, Type$1.NUMBER],
-  '*': [Type$1.NUMBER, Type$1.NUMBER],
-  '%': [Type$1.NUMBER, Type$1.NUMBER],
-  '**': [Type$1.NUMBER, Type$1.NUMBER],
+  '+': [Type.NUMBER, Type.NUMBER],
+  '-': [Type.NUMBER, Type.NUMBER],
+  '/': [Type.NUMBER, Type.NUMBER],
+  'idiv': [Type.NUMBER, Type.NUMBER],
+  '*': [Type.NUMBER, Type.NUMBER],
+  '%': [Type.NUMBER, Type.NUMBER],
+  '**': [Type.NUMBER, Type.NUMBER],
   // == and != can be applied to number and string
   // '==': [Type.NUMBER, Type.BOOLEAN],
   // '!=': [Type.NUMBER, Type.BOOLEAN],
-  '>': [Type$1.NUMBER, Type$1.BOOLEAN],
-  '<': [Type$1.NUMBER, Type$1.BOOLEAN],
-  '>=': [Type$1.NUMBER, Type$1.BOOLEAN],
-  '<=': [Type$1.NUMBER, Type$1.BOOLEAN],
-  '&': [Type$1.NUMBER, Type$1.NUMBER],
-  '|': [Type$1.NUMBER, Type$1.NUMBER],
-  '^': [Type$1.NUMBER, Type$1.NUMBER],
-  '~': [Type$1.NUMBER, Type$1.NUMBER],
-  '>>': [Type$1.NUMBER, Type$1.NUMBER],
-  '<<': [Type$1.NUMBER, Type$1.NUMBER],
-  '!': [Type$1.BOOLEAN, Type$1.BOOLEAN],
-  'and': [Type$1.BOOLEAN, Type$1.BOOLEAN],
-  'or': [Type$1.BOOLEAN, Type$1.BOOLEAN],
+  '>': [Type.NUMBER, Type.BOOLEAN],
+  '<': [Type.NUMBER, Type.BOOLEAN],
+  '>=': [Type.NUMBER, Type.BOOLEAN],
+  '<=': [Type.NUMBER, Type.BOOLEAN],
+  '&': [Type.NUMBER, Type.NUMBER],
+  '|': [Type.NUMBER, Type.NUMBER],
+  '^': [Type.NUMBER, Type.NUMBER],
+  '~': [Type.NUMBER, Type.NUMBER],
+  '>>': [Type.NUMBER, Type.NUMBER],
+  '<<': [Type.NUMBER, Type.NUMBER],
+  '!': [Type.BOOLEAN, Type.BOOLEAN],
+  'and': [Type.BOOLEAN, Type.BOOLEAN],
+  'or': [Type.BOOLEAN, Type.BOOLEAN],
 };
 
 const formatSimVar = (s) => {
@@ -1280,11 +1280,11 @@ class Assembler {
   }
 
   raise(T, message, context) {
-    throw createError$2(T, this.source, context.location, this.specifier, message);
+    throw createError(T, this.source, context.location, this.specifier, message);
   }
 
   warn(message, context) {
-    const detail = createMessage$1(this.source, context.location, this.specifier, message);
+    const detail = createMessage(this.source, context.location, this.specifier, message);
     this.warnings.push({ detail, message, location: context.location });
   }
 
@@ -1305,14 +1305,14 @@ class Assembler {
 
   push(t) {
     /* istanbul ignore next */
-    if (t === Type$1.VOID) {
+    if (t === Type.VOID) {
       throw new RangeError('tried to push void');
     }
     this.stack.push(t);
   }
 
   pop() {
-    return this.stack.pop() || Type$1.VOID;
+    return this.stack.pop() || Type.VOID;
   }
 
   pushScope() {
@@ -1356,7 +1356,7 @@ class Assembler {
       this.visit(s);
       if (s.hasSemicolon !== false) {
         const t0 = this.pop();
-        if (t0 !== Type$1.VOID) {
+        if (t0 !== Type.VOID) {
           this.warn('Unused value', s);
           this.emit('p');
         }
@@ -1388,8 +1388,8 @@ class Assembler {
       this.raise(Error, `Could not resolve '${node.specifier.value}' from '${this.specifier}'`, node.specifier);
     }
     const { source, specifier } = resolved;
-    const ast = Parser$1.parse(source, specifier);
-    const a = new Assembler(Type$1.VOID, source, specifier, this.getSource);
+    const ast = Parser.parse(source, specifier);
+    const a = new Assembler(Type.VOID, source, specifier, this.getSource);
     a.visit(ast);
     for (const i of node.imports) {
       if (!a.exports.has(i.value)) {
@@ -1404,7 +1404,7 @@ class Assembler {
   visitLocalDeclaration(node) {
     this.visit(node.value);
     const t0 = this.pop();
-    if (t0 === Type$1.VOID) {
+    if (t0 === Type.VOID) {
       this.raise(TypeError, `Expected a value but got ${t0}`, node.value);
     }
     const register = this.registerIndex;
@@ -1477,10 +1477,10 @@ class Assembler {
     switch (node.left.type) {
       case 'SimVar':
         if (node.left.value.type) {
-          if (t0 !== SimVarTypes$1[node.left.value.type]) {
-            this.raise(TypeError, `Expected ${SimVarTypes$1[node.left.value.type]} but got ${t0}`, node.right);
+          if (t0 !== SimVarTypes[node.left.value.type]) {
+            this.raise(TypeError, `Expected ${SimVarTypes[node.left.value.type]} but got ${t0}`, node.right);
           }
-        } else if (t0 === Type$1.VOID) {
+        } else if (t0 === Type.VOID) {
           this.raise(TypeError, `Expected a value but got ${t0}`, node.right);
         }
         this.emit(`(>${formatSimVar(node.left.value)})`);
@@ -1491,8 +1491,8 @@ class Assembler {
           this.raise(ReferenceError, `${node.left.value} is not declared`, node.left);
         }
         if (local.alias) {
-          if (t0 !== SimVarTypes$1[local.alias.value.type]) {
-            this.raise(TypeError, `Expected ${SimVarTypes$1[local.alias.value.type]} but got ${t0}`, node.right);
+          if (t0 !== SimVarTypes[local.alias.value.type]) {
+            this.raise(TypeError, `Expected ${SimVarTypes[local.alias.value.type]} but got ${t0}`, node.right);
           }
           this.emit(`(>${formatSimVar(local.alias.value)})`);
         } else {
@@ -1516,7 +1516,7 @@ class Assembler {
     if (t !== i) {
       this.raise(TypeError, `Expected ${i} but got ${t}`, node.operand);
     }
-    this.emit(OperatorOverload$1[node.operator] || node.operator);
+    this.emit(OperatorOverload[node.operator] || node.operator);
     this.push(o);
   }
 
@@ -1533,14 +1533,14 @@ class Assembler {
     switch (node.operator) {
       case '==':
       case '!=':
-        if (t1 === Type$1.STRING) {
-          i = Type$1.STRING;
-        } else if (t1 === Type$1.BOOLEAN) {
-          i = Type$1.BOOLEAN;
+        if (t1 === Type.STRING) {
+          i = Type.STRING;
+        } else if (t1 === Type.BOOLEAN) {
+          i = Type.BOOLEAN;
         } else {
-          i = Type$1.NUMBER;
+          i = Type.NUMBER;
         }
-        o = Type$1.BOOLEAN;
+        o = Type.BOOLEAN;
         break;
       default:
         ([i, o] = OpTypes[node.operator]);
@@ -1553,14 +1553,14 @@ class Assembler {
     switch (node.operator) {
       case '==':
       case '!=':
-        if (i === Type$1.STRING) {
+        if (i === Type.STRING) {
           this.emit(`scmp 0 ${node.operator}`);
         } else {
           this.emit(node.operator);
         }
         break;
       default:
-        this.emit(OperatorOverload$1[node.operator] || node.operator);
+        this.emit(OperatorOverload[node.operator] || node.operator);
         break;
     }
     this.push(o);
@@ -1568,31 +1568,31 @@ class Assembler {
 
   visitMethodExpression(node) {
     const ops = {
-      abs: ['abs', Type$1.NUMBER, [], Type$1.NUMBER],
-      floor: ['flr', Type$1.NUMBER, [], Type$1.NUMBER],
-      range: ['rng', Type$1.NUMBER, [Type$1.NUMBER, Type$1.NUMBER], Type$1.NUMBER],
-      cos: ['cos', Type$1.NUMBER, [], Type$1.NUMBER],
-      min: ['min', Type$1.NUMBER, [Type$1.NUMBER], Type$1.NUMBER],
-      sin: ['sin', Type$1.NUMBER, [], Type$1.NUMBER],
-      acos: ['acos', Type$1.NUMBER, [], Type$1.NUMBER],
-      ctg: ['ctg', Type$1.NUMBER, [], Type$1.NUMBER],
-      ln: ['ln', Type$1.NUMBER, [], Type$1.NUMBER],
-      square: ['sqr', Type$1.NUMBER, [], Type$1.NUMBER],
-      asin: ['asin', Type$1.NUMBER, [], Type$1.NUMBER],
-      eps: ['eps', Type$1.NUMBER, [], Type$1.NUMBER],
-      log: ['log', Type$1.NUMBER, [Type$1.NUMBER], Type$1.NUMBER],
-      sqrt: ['sqrt', Type$1.NUMBER, [], Type$1.NUMBER],
-      atg2: ['atg2', Type$1.NUMBER, [Type$1.NUMBER], Type$1.NUMBER],
-      exp: ['exp', Type$1.NUMBER, [], Type$1.NUMBER],
-      max: ['max', Type$1.NUMBER, [Type$1.NUMBER], Type$1.NUMBER],
-      tan: ['tg', Type$1.NUMBER, [], Type$1.NUMBER],
-      atan: ['atg', Type$1.NUMBER, [], Type$1.NUMBER],
-      d360: ['d360', Type$1.NUMBER, [], Type$1.NUMBER],
-      toDegrees: ['rddg', Type$1.NUMBER, [], Type$1.NUMBER],
-      toRadians: ['dgrd', Type$1.NUMBER, [], Type$1.NUMBER],
-      rnor: ['rnor', Type$1.NUMBER, [], Type$1.NUMBER],
-      toLowerCase: ['lc', Type$1.STRING, [], Type$1.STRING],
-      toUpperCase: ['uc', Type$1.STRING, [], Type$1.STRING],
+      abs: ['abs', Type.NUMBER, [], Type.NUMBER],
+      floor: ['flr', Type.NUMBER, [], Type.NUMBER],
+      range: ['rng', Type.NUMBER, [Type.NUMBER, Type.NUMBER], Type.NUMBER],
+      cos: ['cos', Type.NUMBER, [], Type.NUMBER],
+      min: ['min', Type.NUMBER, [Type.NUMBER], Type.NUMBER],
+      sin: ['sin', Type.NUMBER, [], Type.NUMBER],
+      acos: ['acos', Type.NUMBER, [], Type.NUMBER],
+      ctg: ['ctg', Type.NUMBER, [], Type.NUMBER],
+      ln: ['ln', Type.NUMBER, [], Type.NUMBER],
+      square: ['sqr', Type.NUMBER, [], Type.NUMBER],
+      asin: ['asin', Type.NUMBER, [], Type.NUMBER],
+      eps: ['eps', Type.NUMBER, [], Type.NUMBER],
+      log: ['log', Type.NUMBER, [Type.NUMBER], Type.NUMBER],
+      sqrt: ['sqrt', Type.NUMBER, [], Type.NUMBER],
+      atg2: ['atg2', Type.NUMBER, [Type.NUMBER], Type.NUMBER],
+      exp: ['exp', Type.NUMBER, [], Type.NUMBER],
+      max: ['max', Type.NUMBER, [Type.NUMBER], Type.NUMBER],
+      tan: ['tg', Type.NUMBER, [], Type.NUMBER],
+      atan: ['atg', Type.NUMBER, [], Type.NUMBER],
+      d360: ['d360', Type.NUMBER, [], Type.NUMBER],
+      toDegrees: ['rddg', Type.NUMBER, [], Type.NUMBER],
+      toRadians: ['dgrd', Type.NUMBER, [], Type.NUMBER],
+      rnor: ['rnor', Type.NUMBER, [], Type.NUMBER],
+      toLowerCase: ['lc', Type.STRING, [], Type.STRING],
+      toUpperCase: ['uc', Type.STRING, [], Type.STRING],
     };
     if (ops[node.callee.value]) {
       const [raw, self, args, ret] = ops[node.callee.value];
@@ -1647,31 +1647,31 @@ class Assembler {
 
   visitBooleanLiteral(node) {
     this.emit(node.value ? '1' : '0');
-    this.push(Type$1.BOOLEAN);
+    this.push(Type.BOOLEAN);
   }
 
   visitNumberLiteral(node) {
     this.emit(node.value.toString());
-    this.push(Type$1.NUMBER);
+    this.push(Type.NUMBER);
   }
 
   visitStringLiteral(node) {
     this.emit(`'${node.value.toString()}'`);
-    this.push(Type$1.STRING);
+    this.push(Type.STRING);
   }
 
   visitSimVar(node) {
     this.emit(`(${formatSimVar(node.value)})`);
-    this.push(SimVarTypes$1[node.value.type] || Type$1.ANY);
+    this.push(SimVarTypes[node.value.type] || Type.ANY);
   }
 
-  visitInsert(node) {
+  visitTemplate(node) {
     this.emit(`#${node.value.name}#`);
     if (node.value.type) {
-      if (!SimVarTypes$1[node.value.type]) {
+      if (!SimVarTypes[node.value.type]) {
         this.raise(TypeError, `${node.value.type} is not a valid type`, node);
       }
-      this.push(SimVarTypes$1[node.value.type]);
+      this.push(SimVarTypes[node.value.type]);
     } else if (!node.statement) {
       this.raise(TypeError, 'Expected a type', node);
     }
@@ -1680,8 +1680,8 @@ class Assembler {
   visitIf(node) {
     this.visit(node.test);
     const t = this.pop();
-    if (t !== Type$1.BOOLEAN) {
-      this.raise(TypeError, `Expected ${Type$1.BOOLEAN} but got ${t}`, node.test);
+    if (t !== Type.BOOLEAN) {
+      this.raise(TypeError, `Expected ${Type.BOOLEAN} but got ${t}`, node.test);
     }
 
     const visitBranch = (open, n) => {
@@ -1701,11 +1701,11 @@ class Assembler {
       if (this.stack.length !== len) {
         return this.pop();
       }
-      return Type$1.VOID;
+      return Type.VOID;
     };
 
     const t0 = visitBranch('if{', node.consequent);
-    if (t0 !== Type$1.VOID && !node.alternative) {
+    if (t0 !== Type.VOID && !node.alternative) {
       this.raise(SyntaxError, 'If expression with consequent value must have alternative', node);
     }
 
@@ -1716,9 +1716,9 @@ class Assembler {
       }
     }
 
-    if (t0 !== Type$1.VOID) {
+    if (t0 !== Type.VOID) {
       if (node.statement) {
-        this.raise(TypeError, `Expected ${Type$1.VOID} but got ${t0}`, node);
+        this.raise(TypeError, `Expected ${Type.VOID} but got ${t0}`, node);
       }
       this.push(t0);
     }
@@ -1730,8 +1730,8 @@ class Assembler {
     this.popScope();
     if (node.statement) {
       const t0 = this.pop();
-      if (t0 !== Type$1.VOID) {
-        this.raise(TypeError, `Expected ${Type$1.VOID} but got ${t0}`, node);
+      if (t0 !== Type.VOID) {
+        this.raise(TypeError, `Expected ${Type.VOID} but got ${t0}`, node);
       }
     }
   }
