@@ -189,7 +189,7 @@ Reference a SimVar.
 (X:Y, unit)
 ```
 
-#### Inserts
+#### Templates
 
 Allows XML substitutions. Expressions must be typed.
 

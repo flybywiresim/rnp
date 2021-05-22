@@ -73,7 +73,7 @@ const MaybeAssignTokens = [
   ['IDENTIFIER', null],
   ['MACRO_IDENTIFIER', null],
   ['SIMVAR', null],
-  ['INSERT', null],
+  ['TEMPLATE', null],
   ['EOS', null],
 
   ['COMMA', ','],
@@ -271,7 +271,7 @@ class Lexer {
         }
         return Token.LPAREN;
       case '#':
-        return this.scanInsert();
+        return this.scanTemplate();
       default: {
         const start = this.position;
         if (isIDStart(this.source[this.position]) || this.source[this.position] === '$') {
@@ -413,13 +413,13 @@ class Lexer {
     return Token.SIMVAR;
   }
 
-  scanInsert() {
+  scanTemplate() {
     this.position += 1;
     const nameStart = this.position;
     let typeStart = -1;
     while (true) { // eslint-disable-line no-constant-condition
       if (this.position >= this.source.length || this.source[this.position] === '\n') {
-        this.raise('Unexpected end of insert', this.position);
+        this.raise('Unexpected end of template', this.position);
       }
       if (typeStart === -1 && this.source[this.position] === ',') {
         typeStart = this.position;
@@ -437,7 +437,7 @@ class Lexer {
       ? null
       : this.source.slice(typeStart + 1, this.position - 1).trim();
     this.scannedValue = { name, type };
-    return Token.INSERT;
+    return Token.TEMPLATE;
   }
 }
 

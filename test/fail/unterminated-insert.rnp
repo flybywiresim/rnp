@@ -3,5 +3,5 @@
  --> fail/unterminated-insert.rnp:1:3
   |
 1 | #X
-  |   ^ Unexpected end of insert
+  |   ^ Unexpected end of template
   |

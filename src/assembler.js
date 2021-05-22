@@ -452,7 +452,7 @@ class Assembler {
     this.push(SimVarTypes[node.value.type] || Type.ANY);
   }
 
-  visitInsert(node) {
+  visitTemplate(node) {
     this.emit(`#${node.value.name}#`);
     if (node.value.type) {
       if (!SimVarTypes[node.value.type]) {
