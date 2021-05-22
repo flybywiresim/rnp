@@ -10,7 +10,13 @@
   <body>
     <main>
       <section id="input-section">
-        <h1>RNP</h1>
+        <div style="display: flex; flex-direction: row;">
+          <h1>RNP</h1>
+          <div style="display: flex; flex-grow: 1;"></div>
+          <select id="returnType">
+            <option>void</option>
+          </select>
+        </div>
         <textarea id="input" autocomplete="off">alias event = (M:Event, string);
 alias rudderTrimtabPos = (L:RudderTrimtabPos, number);
 

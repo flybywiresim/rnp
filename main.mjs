@@ -85,16 +85,27 @@ const editor = CodeMirror.fromTextArea(document.querySelector('#input'), {
   lineNumbers: true,
   mode: 'rnp',
   gutters: ['CodeMirror-lint-markers'],
-  lint: true,
+  lint: { lintOnChange: false },
   theme: 'rnp-dark',
   autoCloseBrackets: true,
   matchBrackets: true,
   styleActiveLine: true,
 });
 
+const returnType = document.querySelector('#returnType');
+Object.keys(rnp.Type).forEach((t) => {
+  const o = document.createElement('option');
+  o.text = t.toLowerCase();
+  returnType.appendChild(o);
+});
+
 function translate() {
-  const { output: translated, messages } = rnp.translate(editor.getValue(), '(input)', (r, s) => {
-    throw new Error(`Could not resolve '${s}' from '${r}'`);
+  const {
+    output: translated,
+    messages,
+  } = rnp.translate(editor.getValue(), {
+    specifier: '(input)',
+    returnType: rnp.Type[returnType.value.toUpperCase()],
   });
   cmErrors = messages.map((m) => ({
     severity: m.level,
@@ -102,6 +113,7 @@ function translate() {
     from: CodeMirror.Pos(m.location.start.line - 1, m.location.start.column - 1),
     to: CodeMirror.Pos(m.location.end.line - 1, m.location.end.column - 1),
   }));
+  editor.performLint();
   if (translated) {
     output.innerHTML = translated;
   }
@@ -114,4 +126,7 @@ editor.on('change', () => {
   }
   onChangeTimer = setTimeout(translate, 250);
 });
+
+returnType.addEventListener('change', translate);
+
 translate();
